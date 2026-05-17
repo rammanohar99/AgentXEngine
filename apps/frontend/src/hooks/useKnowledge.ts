@@ -59,7 +59,7 @@ export function useKnowledge(): UseKnowledgeReturn {
 
   // Load on mount
   useEffect(() => {
-    refresh();
+    void refresh();
   }, [refresh]);
 
   return { documents, isLoading, isDeleting, error, refresh, remove };

@@ -3,7 +3,6 @@ Chunker unit tests — deterministic, no external dependencies.
 """
 
 import pytest
-
 from packages.rag.chunker import Chunker
 from packages.rag.schemas import Document, DocumentMetadata
 
@@ -64,6 +63,7 @@ def test_overlap_is_applied() -> None:
     if len(chunks) > 1:
         # The second chunk should contain some text from the first
         first_tail = chunks[0].text[-30:]
+        assert first_tail in chunks[1].text
         # At least some overlap should be present
         assert len(chunks[1].text) > 0
 

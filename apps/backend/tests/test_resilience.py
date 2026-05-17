@@ -17,7 +17,6 @@ import asyncio
 import time
 
 import pytest
-
 from packages.agents.context_manager import ContextManager
 from packages.agents.resilience import (
     CircuitBreaker,
@@ -30,7 +29,6 @@ from packages.agents.resilience import (
 from packages.agents.runtime import AgentRuntime, Message
 from packages.agents.schemas import AgentEventType
 from packages.agents.tool_registry import ToolRegistry
-
 
 # ── Transient error detection ─────────────────────────────────────────────────
 

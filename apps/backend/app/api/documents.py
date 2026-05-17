@@ -17,7 +17,24 @@ Supported upload formats:
 Routes are thin: validate input, call RAGService, return typed response.
 """
 
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from packages.rag.extractor import (
+    extract_image_text,
+    extract_text,
+    get_source_type,
+)
+from packages.rag.schemas import (
+    DocumentMetadata,
+    IngestRequest,
+    IngestResponse,
+    SearchRequest,
+    SearchResponse,
+)
+from packages.rag.schemas import (
+    IngestRequest as RagIngestRequest,
+)
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
@@ -25,15 +42,6 @@ from app.core.database import get_db_session
 from app.core.logging import get_logger
 from app.schemas.common import APIResponse
 from app.services.rag import RAGService
-from packages.rag.extractor import BINARY_EXTENSIONS, extract_image_text, extract_text, get_source_type
-from packages.rag.schemas import (
-    DocumentMetadata,
-    IngestRequest,
-    IngestResponse,
-    IngestRequest as RagIngestRequest,
-    SearchRequest,
-    SearchResponse,
-)
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/documents", tags=["documents"])
@@ -42,7 +50,7 @@ router = APIRouter(prefix="/documents", tags=["documents"])
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024
 
 
-def get_rag_service(session: AsyncSession = Depends(get_db_session)) -> RAGService:
+def get_rag_service(session: Annotated[AsyncSession, Depends(get_db_session)]) -> RAGService:
     """
     Dependency injection for RAGService.
 
@@ -70,7 +78,7 @@ def get_rag_service(session: AsyncSession = Depends(get_db_session)) -> RAGServi
 
 @router.get("/", response_model=APIResponse[list[dict]])
 async def list_documents(
-    service: RAGService = Depends(get_rag_service),
+    service: Annotated[RAGService, Depends(get_rag_service)],
 ) -> APIResponse[list[dict]]:
     """
     List all ingested documents with metadata and chunk counts.
@@ -90,7 +98,7 @@ async def list_documents(
 @router.delete("/{document_id}", response_model=APIResponse[dict])
 async def delete_document(
     document_id: str,
-    service: RAGService = Depends(get_rag_service),
+    service: Annotated[RAGService, Depends(get_rag_service)],
 ) -> APIResponse[dict]:
     """
     Delete a document and all its chunks from the knowledge base.
@@ -116,8 +124,8 @@ async def delete_document(
 
 @router.post("/upload", response_model=APIResponse[IngestResponse])
 async def upload_document(
-    file: UploadFile = File(...),
-    service: RAGService = Depends(get_rag_service),
+    file: Annotated[UploadFile, File(...)],
+    service: Annotated[RAGService, Depends(get_rag_service)],
 ) -> APIResponse[IngestResponse]:
     """
     Upload a file and ingest it into the RAG knowledge base.
@@ -213,7 +221,7 @@ async def upload_document(
 @router.post("/ingest", response_model=APIResponse[IngestResponse])
 async def ingest_document(
     request: IngestRequest,
-    service: RAGService = Depends(get_rag_service),
+    service: Annotated[RAGService, Depends(get_rag_service)],
 ) -> APIResponse[IngestResponse]:
     """
     Ingest pre-extracted text into the RAG knowledge base.
@@ -235,7 +243,7 @@ async def ingest_document(
 @router.post("/search", response_model=APIResponse[SearchResponse])
 async def search_documents(
     request: SearchRequest,
-    service: RAGService = Depends(get_rag_service),
+    service: Annotated[RAGService, Depends(get_rag_service)],
 ) -> APIResponse[SearchResponse]:
     """
     Search the knowledge base using semantic similarity.

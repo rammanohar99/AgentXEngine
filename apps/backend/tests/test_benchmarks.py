@@ -20,17 +20,14 @@ Compare runs:
 from __future__ import annotations
 
 import io
-import string
 import random
 
 import pytest
-
-from packages.rag.chunker import Chunker
-from packages.rag.schemas import Document, DocumentMetadata
-from packages.rag.embeddings import _build_token_aware_batches, _estimate_tokens
 from packages.agents.planner import Planner
 from packages.agents.tool_registry import ToolRegistry
-
+from packages.rag.chunker import Chunker
+from packages.rag.embeddings import _build_token_aware_batches, _estimate_tokens
+from packages.rag.schemas import Document, DocumentMetadata
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 

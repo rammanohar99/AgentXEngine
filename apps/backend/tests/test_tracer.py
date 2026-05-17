@@ -4,7 +4,6 @@ Tracer unit tests — verifies NoOpTracer and span lifecycle.
 No Langfuse credentials needed — tests use NoOpTracer only.
 """
 
-import pytest
 
 from packages.observability.tracer import AgentTracer, NoOpTracer
 

@@ -74,7 +74,6 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             now = time.time()
             window_start = now - self._window_seconds
 
-            pipe = redis.pipeline()
             # Remove old entries outside the window
             await redis.zremrangebyscore(key, 0, window_start)
             # Count current requests in window
@@ -118,7 +117,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         client_ip = self._get_client_ip(request)
         limit = self._get_limit_for_path(request.url.path)
-        key = f"ratelimit:{client_ip}:{request.url.path.split('/')[3] if len(request.url.path.split('/')) > 3 else 'default'}"
+
+        path_parts = request.url.path.split("/")
+        category = path_parts[3] if len(path_parts) > 3 else "default"
+        key = f"ratelimit:{client_ip}:{category}"
 
         is_allowed, remaining = await self._check_rate_limit_redis(key, limit)
 

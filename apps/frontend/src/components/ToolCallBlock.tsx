@@ -21,7 +21,7 @@ interface ToolCallBlockProps {
 export function ToolCallBlock({ callChunk, resultChunk }: ToolCallBlockProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const toolName = (callChunk.metadata?.tool_name as string) ?? "unknown";
+  const toolName = (callChunk.metadata?.tool_name as string | undefined) ?? "unknown";
   const args = callChunk.metadata?.arguments as Record<string, unknown> | undefined;
   const isSuccess = resultChunk?.metadata?.success as boolean | undefined;
   const durationMs = resultChunk?.metadata?.duration_ms as number | undefined;
@@ -40,7 +40,7 @@ export function ToolCallBlock({ callChunk, resultChunk }: ToolCallBlockProps) {
     >
       {/* Header row */}
       <button
-        onClick={() => setIsExpanded((prev) => !prev)}
+        onClick={() => { setIsExpanded((prev) => !prev); }}
         className="flex w-full items-center gap-2 px-3 py-2 text-left transition-colors hover:opacity-80"
         aria-expanded={isExpanded}
       >
@@ -57,7 +57,7 @@ export function ToolCallBlock({ callChunk, resultChunk }: ToolCallBlockProps) {
           <XCircle size={12} className="text-red-600 dark:text-red-400" />
         )}
         {durationMs !== undefined && (
-          <span className="text-muted-foreground">{durationMs}ms</span>
+          <span className="text-muted-foreground">{durationMs.toString()}ms</span>
         )}
         {isExpanded ? (
           <ChevronDown size={12} className="text-muted-foreground" />

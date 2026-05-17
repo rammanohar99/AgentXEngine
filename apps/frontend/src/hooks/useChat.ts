@@ -86,7 +86,7 @@ export function useChat(): UseChatReturn {
         setMessages((prev) => {
           const updated = [...prev];
           const last = updated[updated.length - 1];
-          if (last?.content === "" && last.events.length === 0) {
+          if (updated.length > 0 && last.content === "" && last.events.length === 0) {
             updated.pop();
           }
           return updated;

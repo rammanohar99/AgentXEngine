@@ -14,14 +14,12 @@ Tests verify:
 from __future__ import annotations
 
 import pathlib
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
-
-from packages.agents.runtime import AgentRuntime, Message
+from packages.agents.runtime import AgentRuntime
 from packages.agents.schemas import AgentEventType
 from packages.agents.tool_registry import ToolRegistry
-
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -84,7 +82,9 @@ async def test_direct_final_answer_emits_text_and_done() -> None:
 
 
 @pytest.mark.asyncio
-async def test_tool_call_then_final_answer(tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_tool_call_then_final_answer(
+    tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """
     Simulate: LLM calls read_file → gets observation → produces Final Answer.
     Verifies the full REASONING → TOOL_CALL → TOOL_RESULT → TEXT → DONE sequence.
@@ -166,7 +166,9 @@ async def test_step_limit_forces_final_answer() -> None:
 
 
 @pytest.mark.asyncio
-async def test_failed_tool_still_continues(tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch) -> None:
+async def test_failed_tool_still_continues(
+    tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """
     A tool failure (file not found) should inject an error observation
     and allow the agent to continue to a final answer.

@@ -48,17 +48,18 @@ def summarize_session_memory(
             "summarize_failed",
             extra={"session_id": session_id, "error": str(exc)},
         )
-        raise self.retry(exc=exc)
+        raise self.retry(exc=exc) from exc
 
 
 async def _summarize_async(
     session_id: str, turns: list[dict[str, Any]]
 ) -> dict[str, Any]:
     """Async implementation of memory summarization."""
-    from app.core.redis import get_redis_client
-    from app.services.vertex_ai import VertexAIService
     from packages.memory.schemas import ConversationTurn
     from packages.memory.summarizer import MemorySummarizer
+
+    from app.core.redis import get_redis_client
+    from app.services.vertex_ai import VertexAIService
 
     llm = VertexAIService()
     summarizer = MemorySummarizer(llm_provider=llm)

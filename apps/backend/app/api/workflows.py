@@ -9,17 +9,10 @@ Routes:
 
 from __future__ import annotations
 
-import uuid
-
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 
 from app.core.logging import get_logger
 from app.schemas.common import APIResponse
-from packages.workflows.schemas import (
-    WorkflowRequest,
-    WorkflowResponse,
-    WorkflowStatus,
-)
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/workflows", tags=["workflows"])
@@ -76,8 +69,9 @@ async def get_task_status(task_id: str) -> APIResponse[dict]:
     Returns the task state and result if complete.
     """
     try:
-        from app.workers.celery_app import celery_app
         from celery.result import AsyncResult
+
+        from app.workers.celery_app import celery_app
 
         result = AsyncResult(task_id, app=celery_app)
 

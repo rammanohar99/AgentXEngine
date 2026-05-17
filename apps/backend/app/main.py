@@ -12,11 +12,12 @@ This file should stay thin. Configuration lives in core/config.py,
 middleware in core/middleware.py, routes in api/.
 """
 
-from contextlib import asynccontextmanager
 from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from packages.observability.otel import configure_otel, instrument_fastapi
 
 from app.api.router import api_router
 from app.core.config import get_settings
@@ -24,7 +25,6 @@ from app.core.logging import configure_logging, get_logger
 from app.core.middleware import CorrelationIDMiddleware
 from app.core.rate_limit import RateLimitMiddleware
 from app.core.redis import close_redis
-from packages.observability.otel import configure_otel, instrument_fastapi
 
 # Configure structured logging before anything else runs
 configure_logging()

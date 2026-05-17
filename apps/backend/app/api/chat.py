@@ -12,6 +12,8 @@ The SSE stream emits JSON-encoded StreamChunk objects.
 Chunk types: text | reasoning | tool_call | tool_result | done | error
 """
 
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 
@@ -32,7 +34,7 @@ def get_agent_service() -> AgentService:
 @router.post("", response_model=APIResponse[ChatResponse])
 async def chat(
     request: ChatRequest,
-    service: AgentService = Depends(get_agent_service),
+    service: Annotated[AgentService, Depends(get_agent_service)],
 ) -> APIResponse[ChatResponse]:
     """Non-streaming agent chat completion."""
     try:
@@ -49,7 +51,7 @@ async def chat(
 @router.post("/stream")
 async def stream_chat(
     request: ChatRequest,
-    service: AgentService = Depends(get_agent_service),
+    service: Annotated[AgentService, Depends(get_agent_service)],
 ) -> StreamingResponse:
     """
     Streaming agent chat via Server-Sent Events.

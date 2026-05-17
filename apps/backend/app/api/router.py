@@ -6,7 +6,7 @@ Adding a new feature means importing its router here.
 
 from fastapi import APIRouter
 
-from app.api import chat, health, documents, workflows
+from app.api import chat, documents, health, workflows
 
 api_router = APIRouter()
 

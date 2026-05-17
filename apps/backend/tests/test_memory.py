@@ -9,12 +9,10 @@ Summarizer uses a mock LLM provider.
 from __future__ import annotations
 
 import pytest
-
 from packages.memory.manager import MemoryManager
 from packages.memory.schemas import ConversationTurn
 from packages.memory.short_term import ShortTermMemory
 from packages.memory.summarizer import MemorySummarizer
-
 
 # ── Short-term memory tests ───────────────────────────────────────────────────
 

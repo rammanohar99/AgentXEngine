@@ -55,7 +55,7 @@ export function ChatPage() {
 
       await sendMessage(
         `I've uploaded the ${label} "${file.name}" into the knowledge base ` +
-          `(${result.chunk_count} chunks indexed). You can now ask me questions about its contents.`,
+          `(${result.chunk_count.toString()} chunks indexed). You can now ask me questions about its contents.`,
       );
     },
     [sendMessage],
@@ -75,7 +75,7 @@ export function ChatPage() {
         <div className="flex items-center gap-2">
           {!isEmpty && (
             <button
-              onClick={clearSession}
+              onClick={() => { clearSession(); }}
               aria-label="New session"
               className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >
@@ -86,7 +86,7 @@ export function ChatPage() {
 
           {/* Knowledge base toggle */}
           <button
-            onClick={() => setPanelOpen((o) => !o)}
+            onClick={() => { setPanelOpen((o) => !o); }}
             aria-label="Open knowledge base"
             aria-expanded={panelOpen}
             className={cn(
@@ -146,7 +146,7 @@ export function ChatPage() {
       <div className="border-t border-border px-4 py-4">
         <div className="mx-auto max-w-3xl">
           <ChatInput
-            onSend={sendMessage}
+            onSend={(msg) => { void sendMessage(msg); }}
             onIngestFile={handleIngestFile}
             isDisabled={isStreaming}
           />
@@ -160,7 +160,7 @@ export function ChatPage() {
       <KnowledgePanel
         key={knowledgeRefreshKey}
         isOpen={panelOpen}
-        onClose={() => setPanelOpen(false)}
+        onClose={() => { setPanelOpen(false); }}
       />
     </div>
   );

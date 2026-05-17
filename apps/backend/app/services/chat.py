@@ -12,13 +12,12 @@ The agent runtime (Phase 2) will replace the direct LLM call
 with a full ReAct loop.
 """
 
-import uuid
 from collections.abc import AsyncGenerator
 
 from app.core.logging import get_logger
 from app.schemas.chat import ChatMessage, ChatRequest, ChatResponse, MessageRole, StreamChunk
-from app.services.vertex_ai import VertexAIService
 from app.services.session import SessionManager
+from app.services.vertex_ai import VertexAIService
 
 logger = get_logger(__name__)
 
@@ -48,7 +47,11 @@ class ChatService:
         logger.info("chat_request", session_id=session_id, message_length=len(request.message))
 
         # Dynamically inject system prompt
-        messages = [ChatMessage(role=MessageRole.SYSTEM, content=SYSTEM_PROMPT)] + history + [user_message]
+        messages = (
+            [ChatMessage(role=MessageRole.SYSTEM, content=SYSTEM_PROMPT)]
+            + history
+            + [user_message]
+        )
 
         response = await self._vertex.complete(messages=messages)
         reply_text = response.text
@@ -83,7 +86,11 @@ class ChatService:
         full_response = ""
 
         # Dynamically inject system prompt
-        messages = [ChatMessage(role=MessageRole.SYSTEM, content=SYSTEM_PROMPT)] + history + [user_message]
+        messages = (
+            [ChatMessage(role=MessageRole.SYSTEM, content=SYSTEM_PROMPT)]
+            + history
+            + [user_message]
+        )
 
         async for text_chunk in self._vertex.stream(messages=messages):
             full_response += text_chunk

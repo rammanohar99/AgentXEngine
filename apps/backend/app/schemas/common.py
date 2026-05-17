@@ -5,9 +5,10 @@ These are the base response envelopes and error types
 that every endpoint returns — keeps the API contract consistent.
 """
 
-from typing import Any, Generic, TypeVar
-from pydantic import BaseModel, Field
 import datetime
+from typing import Any, Generic, TypeVar
+
+from pydantic import BaseModel, Field
 
 DataT = TypeVar("DataT")
 
@@ -16,7 +17,9 @@ class HealthStatus(BaseModel):
     status: str
     version: str
     environment: str
-    timestamp: datetime.datetime = Field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
+    timestamp: datetime.datetime = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
+    )
     checks: dict[str, bool] = Field(default_factory=dict)
 
 

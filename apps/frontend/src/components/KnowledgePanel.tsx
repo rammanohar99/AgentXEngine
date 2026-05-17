@@ -101,7 +101,7 @@ function DocumentRow({
       </div>
 
       <button
-        onClick={() => onDeleteRequest(doc)}
+        onClick={() => { onDeleteRequest(doc); }}
         disabled={isDeleting}
         aria-label={`Delete ${doc.source}`}
         title="Remove from knowledge base"
@@ -130,10 +130,9 @@ export function KnowledgePanel({ isOpen, onClose }: KnowledgePanelProps) {
     setPendingDelete(doc);
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = () => {
     if (!pendingDelete) return;
-    await remove(pendingDelete.document_id);
-    setPendingDelete(null);
+    void remove(pendingDelete.document_id).then(() => { setPendingDelete(null); });
   };
 
   return (
@@ -169,7 +168,7 @@ export function KnowledgePanel({ isOpen, onClose }: KnowledgePanelProps) {
           </div>
           <div className="flex items-center gap-1">
             <button
-              onClick={refresh}
+              onClick={() => { void refresh(); }}
               disabled={isLoading}
               aria-label="Refresh"
               title="Refresh list"
@@ -236,7 +235,7 @@ export function KnowledgePanel({ isOpen, onClose }: KnowledgePanelProps) {
       {/* Delete confirmation modal — rendered outside the panel so it's always on top */}
       <AlertDialog
         open={pendingDelete !== null}
-        onOpenChange={(open) => { if (!open) setPendingDelete(null); }}
+        onOpenChange={(open) => { if (!open) { setPendingDelete(null); } }}
         title="Remove from knowledge base?"
         description={
           pendingDelete ? (

@@ -8,6 +8,7 @@ migration path for Phase 7 (Redis).
 """
 
 import uuid
+
 from app.schemas.chat import ChatMessage
 
 # Single source of truth for runtime session state

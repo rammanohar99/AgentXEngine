@@ -5,7 +5,6 @@ The retriever callable is mocked — no database or embedding service needed.
 """
 
 import pytest
-
 from packages.agents.schemas import ToolCall
 from packages.agents.tools.retrieval import RetrieveDocumentsTool
 
@@ -61,7 +60,16 @@ async def test_retrieval_tool_no_results() -> None:
 
 @pytest.mark.asyncio
 async def test_retrieval_tool_respects_top_k() -> None:
-    results = [{"chunk_id": f"c{i}", "document_id": "d1", "text": f"Result {i}", "score": 0.9, "source": "src"} for i in range(10)]
+    results = [
+        {
+            "chunk_id": f"c{i}",
+            "document_id": "d1",
+            "text": f"Result {i}",
+            "score": 0.9,
+            "source": "src",
+        }
+        for i in range(10)
+    ]
     captured_top_k: list[int] = []
 
     async def tracking_retriever(query: str, top_k: int) -> list[dict]:

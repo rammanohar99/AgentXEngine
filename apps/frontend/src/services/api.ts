@@ -36,7 +36,7 @@ export interface KnowledgeDocument {
   chunk_count: number;
 }
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? "/api/v1";
+const BASE_URL: string = (import.meta.env.VITE_API_URL as string | undefined) ?? "/api/v1";
 
 export class ApiError extends Error {
   constructor(
@@ -51,7 +51,7 @@ export class ApiError extends Error {
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const body = await response.text();
-    throw new ApiError(response.status, body || response.statusText);
+    throw new ApiError(response.status, body.length > 0 ? body : response.statusText);
   }
   return response.json() as Promise<T>;
 }
@@ -152,7 +152,7 @@ export async function streamChatMessage(
     return;
   }
 
-  if (!response.ok || !response.body) {
+  if (!response.ok || response.body === null) {
     onError(new ApiError(response.status, "Stream request failed"));
     return;
   }
@@ -171,16 +171,17 @@ export async function streamChatMessage(
       buffer = lines.pop() ?? ""; // Keep incomplete line in buffer
 
       for (const line of lines) {
-        if (!line.startsWith("data: ")) continue;
-        const jsonStr = line.slice(6).trim();
-        if (!jsonStr) continue;
+        const prefix = "data: ";
+        if (!line.startsWith(prefix)) continue;
+        const jsonStr = line.slice(prefix.length).trim();
+        if (jsonStr.length === 0) continue;
 
         try {
           const chunk = JSON.parse(jsonStr) as StreamChunk;
           onChunk(chunk);
 
           if (chunk.type === "done") {
-            const sessionId = (chunk.metadata?.session_id as string) ?? "";
+            const sessionId = (chunk.metadata?.session_id as string | undefined) ?? "";
             onDone(sessionId);
             return;
           }

@@ -17,12 +17,6 @@ Design:
 
 from __future__ import annotations
 
-import uuid
-
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.core.logging import get_logger
-from app.repositories.document import DocumentRepository
 from packages.rag.chunker import Chunker
 from packages.rag.schemas import (
     Document,
@@ -33,6 +27,10 @@ from packages.rag.schemas import (
     SearchRequest,
     SearchResponse,
 )
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.logging import get_logger
+from app.repositories.document import DocumentRepository
 
 logger = get_logger(__name__)
 
@@ -112,7 +110,7 @@ class RAGService:
                 "chunk_index": chunk.chunk_index,
                 "embedding": embedding,
             }
-            for chunk, embedding in zip(chunks, embeddings)
+            for chunk, embedding in zip(chunks, embeddings, strict=False)
         ]
         await self._repo.create_chunks(doc_model.id, chunk_data)
 

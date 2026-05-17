@@ -19,7 +19,7 @@ export function ReasoningBlock({ content }: ReasoningBlockProps) {
   return (
     <div className="my-1 rounded-lg border border-border bg-muted/40 text-xs">
       <button
-        onClick={() => setIsExpanded((prev) => !prev)}
+        onClick={() => { setIsExpanded((prev) => !prev); }}
         className="flex w-full items-center gap-2 px-3 py-2 text-left text-muted-foreground transition-colors hover:text-foreground"
         aria-expanded={isExpanded}
       >

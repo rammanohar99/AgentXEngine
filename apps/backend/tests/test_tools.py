@@ -6,8 +6,8 @@ This gives us confidence the sandbox logic actually works.
 """
 
 import pathlib
-import pytest
 
+import pytest
 from packages.agents.schemas import ToolCall
 from packages.agents.tools.filesystem import (
     ListDirectoryTool,
@@ -15,7 +15,6 @@ from packages.agents.tools.filesystem import (
     SearchFilesTool,
     _safe_resolve,
 )
-
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 
@@ -33,7 +32,9 @@ def workspace(tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch) -> pathli
     (tmp_path / "README.md").write_text("# Test Project\n\nThis is a test.\n")
     subdir = tmp_path / "src"
     subdir.mkdir()
-    (subdir / "main.py").write_text("from hello import hello\n\nif __name__ == '__main__':\n    print(hello())\n")
+    (subdir / "main.py").write_text(
+        "from hello import hello\n\nif __name__ == '__main__':\n    print(hello())\n"
+    )
     (subdir / "utils.py").write_text("def add(a: int, b: int) -> int:\n    return a + b\n")
 
     return tmp_path

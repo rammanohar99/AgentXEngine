@@ -6,8 +6,8 @@ Uses real filesystem tools with a temp workspace.
 """
 
 import pathlib
-import pytest
 
+import pytest
 from packages.agents.executor import Executor
 from packages.agents.schemas import ToolCall
 from packages.agents.tool_registry import ToolRegistry

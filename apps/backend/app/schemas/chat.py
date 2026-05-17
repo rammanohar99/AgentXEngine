@@ -5,10 +5,11 @@ These define the API contract for the chat endpoint —
 what the frontend sends and what the backend returns.
 """
 
+import datetime
 from enum import Enum
 from typing import Any
+
 from pydantic import BaseModel, Field
-import datetime
 
 
 class MessageRole(str, Enum):
@@ -35,7 +36,9 @@ class ChatResponse(BaseModel):
     session_id: str
     message: ChatMessage
     usage: dict[str, int] | None = None
-    created_at: datetime.datetime = Field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
+    created_at: datetime.datetime = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
+    )
 
 
 class StreamChunk(BaseModel):

@@ -52,6 +52,8 @@ jobs:
 
       - name: Type check (mypy)
         run: mypy app/
+        env:
+          PYTHONPATH: ${{ github.workspace }}
 
       - name: Tests
         run: pytest --tb=short -q
@@ -60,6 +62,7 @@ jobs:
           DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/aiengos
           REDIS_URL: redis://localhost:6379/0
           GOOGLE_CLOUD_PROJECT: ""
+          PYTHONPATH: ${{ github.workspace }}
 
     services:
       postgres:

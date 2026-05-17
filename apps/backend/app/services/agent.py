@@ -22,12 +22,6 @@ import time
 import uuid
 from collections.abc import AsyncGenerator
 
-from app.core.config import get_settings
-from app.core.logging import get_logger
-from app.core.redis import get_redis_client
-from app.schemas.chat import ChatMessage, ChatRequest, ChatResponse, MessageRole, StreamChunk
-from app.services.vertex_ai import VertexAIService
-from app.services.session import SessionManager
 from packages.agents.runtime import AgentRuntime, Message
 from packages.agents.schemas import AgentEventType
 from packages.agents.tool_registry import ToolRegistry
@@ -37,6 +31,13 @@ from packages.memory.short_term import ShortTermMemory
 from packages.memory.summarizer import MemorySummarizer
 from packages.observability.evaluation import AgentEvaluator
 from packages.observability.tracer import AgentTracer
+
+from app.core.config import Settings, get_settings
+from app.core.logging import get_logger
+from app.core.redis import get_redis_client
+from app.schemas.chat import ChatMessage, ChatRequest, ChatResponse, MessageRole, StreamChunk
+from app.services.session import SessionManager
+from app.services.vertex_ai import VertexAIService
 
 logger = get_logger(__name__)
 
@@ -107,7 +108,7 @@ def _build_runtime() -> AgentRuntime:
 
 def _register_retrieval_tool(
     registry: ToolRegistry,
-    settings: "Settings",
+    settings: Settings,
     vertex_service: VertexAIService,
 ) -> None:
     """
@@ -117,7 +118,7 @@ def _register_retrieval_tool(
     """
     from typing import TYPE_CHECKING
     if TYPE_CHECKING:
-        from app.core.config import Settings
+        pass
 
     if not settings.google_cloud_project and not settings.gemini_api_key:
         logger.warning("retrieval_tool_skipped", reason="No GCP project or API key configured")
@@ -126,8 +127,9 @@ def _register_retrieval_tool(
     try:
         from packages.agents.tools.retrieval import RetrieveDocumentsTool
         from packages.rag.embeddings import EmbeddingService
-        from app.repositories.document import DocumentRepository
+
         from app.core.database import get_session_factory
+        from app.repositories.document import DocumentRepository
 
         embedding_service = EmbeddingService(
             project=settings.google_cloud_project,

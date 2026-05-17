@@ -30,7 +30,7 @@ function extractCitations(events: StreamChunk[]): Citation[] {
 
     // Parse sources from the tool result content
     const content = event.content ?? "";
-    const sourceMatches = content.matchAll(/\[Source: ([^\|]+)\s*\|\s*Score: ([\d.]+)\]/g);
+    const sourceMatches = content.matchAll(/\[Source: ([^|]+)\s*\|\s*Score: ([\d.]+)\]/g);
 
     for (const match of sourceMatches) {
       const source = match[1].trim();

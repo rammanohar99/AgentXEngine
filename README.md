@@ -49,8 +49,8 @@ repository analysis, RAG, and engineering workflows.
 ### 1. Clone the repo
 
 ```bash
-git clone <repo-url>
-cd <repo-folder>
+git clone https://github.com/rammanohar99/AgentXEngine
+cd AgentXEngine
 ```
 
 ### 2. Configure environment variables

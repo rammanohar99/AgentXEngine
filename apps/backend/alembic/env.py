@@ -8,9 +8,9 @@ Connection URL is pulled from app settings — never hardcoded here.
 import asyncio
 from logging.config import fileConfig
 
-from alembic import context
 from sqlalchemy.ext.asyncio import create_async_engine
 
+from alembic import context
 from app.core.config import get_settings
 from app.core.database import Base
 

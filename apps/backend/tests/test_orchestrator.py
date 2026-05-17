@@ -8,13 +8,10 @@ and workflow execution without real API calls.
 from __future__ import annotations
 
 import pytest
-
 from packages.agents.agent_types import AgentRole, get_agent_config
 from packages.agents.orchestrator import Orchestrator
-from packages.agents.runtime import Message
 from packages.agents.schemas import AgentEventType
 from packages.agents.tool_registry import ToolRegistry
-
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -131,9 +128,16 @@ async def test_orchestrator_delegation_tool_call(tmp_path, monkeypatch) -> None:
     # Second call: specialist (coding agent) answers
     # Third call: orchestrator synthesizes
     responses = [
-        "Thought: I should delegate this to the coding agent.\nAction: delegate_to_agent\nAction Input: {\"agent\": \"coding\", \"task\": \"What is in info.txt?\"}",
+        (
+            "Thought: I should delegate this to the coding agent.\n"
+            "Action: delegate_to_agent\n"
+            'Action Input: {"agent": "coding", "task": "What is in info.txt?"}'
+        ),
         "Thought: Let me read the file.\nFinal Answer: The file contains: The answer is 42.",
-        "Thought: I have the result.\nFinal Answer: According to the coding agent, the answer is 42.",
+        (
+            "Thought: I have the result.\n"
+            "Final Answer: According to the coding agent, the answer is 42."
+        ),
     ]
 
     llm = _make_vertex_mock(responses)
@@ -159,6 +163,7 @@ async def test_orchestrator_delegation_tool_call(tmp_path, monkeypatch) -> None:
 async def test_workflow_executor_runs_tasks() -> None:
     """Workflow executor should run all tasks and collect results."""
     import uuid
+
     from packages.workflows.executor import WorkflowExecutor
     from packages.workflows.schemas import AgentTask, WorkflowRun, WorkflowStatus
 
@@ -202,6 +207,7 @@ async def test_workflow_executor_handles_task_failure() -> None:
     via the task result content, not by crashing the workflow.
     """
     import uuid
+
     from packages.workflows.executor import WorkflowExecutor
     from packages.workflows.schemas import AgentTask, WorkflowRun, WorkflowStatus
 
@@ -279,8 +285,9 @@ async def test_adr004_workflow_task_marked_failed_on_error_event() -> None:
     (e.g., circuit open, LLM failure), the task status is FAILED — not COMPLETE.
     """
     import uuid
+
     from packages.workflows.executor import WorkflowExecutor
-    from packages.workflows.schemas import AgentTask, WorkflowRun, WorkflowStatus, TaskStatus
+    from packages.workflows.schemas import AgentTask, TaskStatus, WorkflowRun, WorkflowStatus
 
     class PermanentFailLLM:
         _model_name = "fail-model"
@@ -325,9 +332,9 @@ async def test_adr003_memory_summarization_failure_does_not_crash_run() -> None:
     Regression test: verify that when the summarizer raises an exception,
     the agent run continues and produces a response.
     """
-    from packages.memory.manager import MemoryManager, _SUMMARIZE_THRESHOLD
-    from packages.memory.short_term import ShortTermMemory
     from packages.memory.long_term import LongTermMemory
+    from packages.memory.manager import _SUMMARIZE_THRESHOLD, MemoryManager
+    from packages.memory.short_term import ShortTermMemory
 
     class ExplodingSummarizer:
         """Summarizer that always raises — simulates LLM failure during summarization."""

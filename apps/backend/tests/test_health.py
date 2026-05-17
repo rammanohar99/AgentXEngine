@@ -42,11 +42,14 @@ def test_liveness_propagates_correlation_id(client: TestClient) -> None:
 
 @pytest.mark.asyncio
 async def test_readiness_healthy() -> None:
+    from httpx import ASGITransport, AsyncClient
+
     from app.main import app
-    from httpx import AsyncClient, ASGITransport
 
     with (
-        patch("app.api.health.check_database_connection", new_callable=AsyncMock, return_value=True),
+        patch(
+            "app.api.health.check_database_connection", new_callable=AsyncMock, return_value=True
+        ),
         patch("app.api.health.check_redis_connection", new_callable=AsyncMock, return_value=True),
     ):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
@@ -61,11 +64,14 @@ async def test_readiness_healthy() -> None:
 
 @pytest.mark.asyncio
 async def test_readiness_degraded_when_db_down() -> None:
+    from httpx import ASGITransport, AsyncClient
+
     from app.main import app
-    from httpx import AsyncClient, ASGITransport
 
     with (
-        patch("app.api.health.check_database_connection", new_callable=AsyncMock, return_value=False),
+        patch(
+            "app.api.health.check_database_connection", new_callable=AsyncMock, return_value=False
+        ),
         patch("app.api.health.check_redis_connection", new_callable=AsyncMock, return_value=True),
     ):
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:

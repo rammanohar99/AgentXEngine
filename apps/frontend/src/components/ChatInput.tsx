@@ -63,8 +63,8 @@ function isBinary(filename: string): boolean {
 }
 
 function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes}B`;
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)}KB`;
+  if (bytes < 1024) return `${bytes.toString()}B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024).toString()}KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
 }
 
@@ -116,7 +116,7 @@ export function ChatInput({
     const textarea = textareaRef.current;
     if (!textarea) return;
     textarea.style.height = "auto";
-    textarea.style.height = `${Math.min(textarea.scrollHeight, 200)}px`;
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 200).toString()}px`;
   }, []);
 
   const handleFileChange = useCallback(
@@ -197,7 +197,7 @@ export function ChatInput({
               <span className="max-w-[120px] truncate">{file.name}</span>
               <span className="text-muted-foreground/60">({formatBytes(file.size)})</span>
               <button
-                onClick={() => removeAttachment(index)}
+                onClick={() => { removeAttachment(index); }}
                 aria-label={`Remove ${file.name}`}
                 className="ml-0.5 rounded hover:text-foreground"
               >
@@ -215,7 +215,7 @@ export function ChatInput({
       <div className="flex items-end gap-2 rounded-2xl border border-border bg-background p-3 shadow-sm">
         {/* File upload button */}
         <button
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => { fileInputRef.current?.click(); }}
           disabled={isBusy}
           aria-label="Attach file"
           title="Attach file (PDF, Excel, CSV, image, or text)"
@@ -237,7 +237,7 @@ export function ChatInput({
           accept={ACCEPTED_TYPES}
           multiple
           className="hidden"
-          onChange={handleFileChange}
+          onChange={(e) => { void handleFileChange(e); }}
           aria-label="File upload"
         />
 

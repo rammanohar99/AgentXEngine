@@ -2,8 +2,9 @@
 Reranker tests — mock LLM, deterministic scoring.
 """
 
-import pytest
+import asyncio
 
+import pytest
 from packages.rag.reranker import Reranker
 from packages.rag.schemas import DocumentMetadata, RetrievalResult
 
@@ -86,7 +87,6 @@ async def test_reranker_clamps_scores() -> None:
     reranked = await reranker.rerank("query", results)
     assert reranked[0].score <= 1.0
 
-import asyncio
 
 @pytest.mark.asyncio
 async def test_reranker_timeout() -> None:
