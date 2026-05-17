@@ -16,7 +16,7 @@ Usage:
 
 import logging
 import sys
-from typing import Any
+from typing import Any, cast
 
 import structlog
 from structlog.types import EventDict, WrappedLogger
@@ -113,4 +113,4 @@ def configure_logging() -> None:
 
 def get_logger(name: str) -> structlog.BoundLogger:
     """Get a named structured logger."""
-    return structlog.get_logger(name)
+    return cast(structlog.BoundLogger, structlog.get_logger(name))

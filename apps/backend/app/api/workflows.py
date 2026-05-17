@@ -9,6 +9,8 @@ Routes:
 
 from __future__ import annotations
 
+from typing import Any
+
 from fastapi import APIRouter, HTTPException, status
 
 from app.core.logging import get_logger
@@ -18,13 +20,13 @@ logger = get_logger(__name__)
 router = APIRouter(prefix="/workflows", tags=["workflows"])
 
 
-@router.post("/ingest", response_model=APIResponse[dict])
+@router.post("/ingest", response_model=APIResponse[dict[str, Any]])
 async def queue_document_ingestion(
     content: str,
     source: str = "",
     source_type: str = "text",
     title: str = "",
-) -> APIResponse[dict]:
+) -> APIResponse[dict[str, Any]]:
     """
     Queue a document for async ingestion into the RAG pipeline.
 
@@ -61,8 +63,8 @@ async def queue_document_ingestion(
         ) from exc
 
 
-@router.get("/tasks/{task_id}", response_model=APIResponse[dict])
-async def get_task_status(task_id: str) -> APIResponse[dict]:
+@router.get("/tasks/{task_id}", response_model=APIResponse[dict[str, Any]])
+async def get_task_status(task_id: str) -> APIResponse[dict[str, Any]]:
     """
     Get the status of a background task.
 
@@ -75,7 +77,7 @@ async def get_task_status(task_id: str) -> APIResponse[dict]:
 
         result = AsyncResult(task_id, app=celery_app)
 
-        response_data: dict = {
+        response_data: dict[str, Any] = {
             "task_id": task_id,
             "status": result.status.lower(),
         }

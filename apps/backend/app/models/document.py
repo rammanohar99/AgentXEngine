@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import datetime
 import uuid
+from typing import Any
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import DateTime, ForeignKey, Index, Integer, Text, func
@@ -41,7 +42,7 @@ class DocumentModel(Base):
     source_type: Mapped[str] = mapped_column(Text, default="")
     title: Mapped[str] = mapped_column(Text, default="")
     language: Mapped[str] = mapped_column(Text, default="")
-    extra_metadata: Mapped[dict] = mapped_column(JSONB, default=dict)
+    extra_metadata: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

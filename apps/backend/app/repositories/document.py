@@ -101,7 +101,8 @@ class DocumentRepository:
         # Convert to a pgvector-compatible string literal: '[0.1, 0.2, ...]'
         vector_str = "[" + ",".join(str(float(v)) for v in query_embedding) + "]"
 
-        sql = text("""
+        sql = text(
+            """
             SELECT
                 c.id            AS chunk_id,
                 c.document_id   AS document_id,
@@ -117,7 +118,8 @@ class DocumentRepository:
             WHERE c.embedding IS NOT NULL
             ORDER BY c.embedding <=> CAST(:vec AS vector)
             LIMIT :top_k
-        """)
+        """
+        )
 
         result = await self._session.execute(
             sql,

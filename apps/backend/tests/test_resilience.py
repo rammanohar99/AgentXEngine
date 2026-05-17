@@ -98,20 +98,20 @@ def test_circuit_resets_on_success() -> None:
 
 
 def test_circuit_transitions_to_half_open_after_recovery() -> None:
-    breaker = CircuitBreaker(failure_threshold=1, recovery_seconds=0.01)
+    breaker = CircuitBreaker(failure_threshold=1, recovery_seconds=0.1)
     breaker.record_failure(RuntimeError("fail"))
     # Immediately after failure, circuit is OPEN
     assert breaker._state == CircuitState.OPEN  # Check internal state directly
 
-    time.sleep(0.02)  # Wait for recovery window
+    time.sleep(0.15)  # Wait for recovery window
     # After recovery window, state property transitions to HALF_OPEN
     assert breaker.state == CircuitState.HALF_OPEN
 
 
 def test_circuit_closes_after_successful_probe() -> None:
-    breaker = CircuitBreaker(failure_threshold=1, recovery_seconds=0.01)
+    breaker = CircuitBreaker(failure_threshold=1, recovery_seconds=0.1)
     breaker.record_failure(RuntimeError("fail"))
-    time.sleep(0.02)
+    time.sleep(0.15)
     assert breaker.state == CircuitState.HALF_OPEN
 
     breaker.record_success()
@@ -119,9 +119,9 @@ def test_circuit_closes_after_successful_probe() -> None:
 
 
 def test_circuit_reopens_after_failed_probe() -> None:
-    breaker = CircuitBreaker(failure_threshold=1, recovery_seconds=0.01)
+    breaker = CircuitBreaker(failure_threshold=1, recovery_seconds=0.1)
     breaker.record_failure(RuntimeError("fail"))
-    time.sleep(0.02)
+    time.sleep(0.15)
     assert breaker.state == CircuitState.HALF_OPEN
 
     breaker.record_failure(RuntimeError("probe failed"))

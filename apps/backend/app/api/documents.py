@@ -17,7 +17,7 @@ Supported upload formats:
 Routes are thin: validate input, call RAGService, return typed response.
 """
 
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from packages.rag.extractor import (
@@ -76,10 +76,10 @@ def get_rag_service(session: Annotated[AsyncSession, Depends(get_db_session)]) -
     return RAGService(session=session, embedding_service=embedding_service)
 
 
-@router.get("/", response_model=APIResponse[list[dict]])
+@router.get("/", response_model=APIResponse[list[dict[str, Any]]])
 async def list_documents(
     service: Annotated[RAGService, Depends(get_rag_service)],
-) -> APIResponse[list[dict]]:
+) -> APIResponse[list[dict[str, Any]]]:
     """
     List all ingested documents with metadata and chunk counts.
     Ordered by most recently ingested first.
@@ -95,11 +95,11 @@ async def list_documents(
         ) from exc
 
 
-@router.delete("/{document_id}", response_model=APIResponse[dict])
+@router.delete("/{document_id}", response_model=APIResponse[dict[str, Any]])
 async def delete_document(
     document_id: str,
     service: Annotated[RAGService, Depends(get_rag_service)],
-) -> APIResponse[dict]:
+) -> APIResponse[dict[str, Any]]:
     """
     Delete a document and all its chunks from the knowledge base.
     Returns 404 if the document does not exist.

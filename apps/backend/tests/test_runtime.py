@@ -14,6 +14,7 @@ Tests verify:
 from __future__ import annotations
 
 import pathlib
+from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
@@ -32,7 +33,7 @@ def _make_vertex_mock(responses: list[str]) -> MagicMock:
     mock = MagicMock()
     call_count = 0
 
-    async def fake_complete(messages, **kwargs):
+    async def fake_complete(messages: list[Any], **kwargs: Any) -> MagicMock:
         nonlocal call_count
         text = responses[min(call_count, len(responses) - 1)]
         call_count += 1
@@ -44,9 +45,9 @@ def _make_vertex_mock(responses: list[str]) -> MagicMock:
     return mock
 
 
-async def _collect_events(runtime: AgentRuntime, message: str) -> list:
+async def _collect_events(runtime: AgentRuntime, message: str) -> list[Any]:
     """Run the runtime and collect all emitted events into a list."""
-    events = []
+    events: list[Any] = []
     async for event in runtime.run(
         session_id="test-session",
         history=[],

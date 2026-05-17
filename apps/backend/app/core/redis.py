@@ -4,6 +4,8 @@ Redis client setup for caching, pub/sub, and Celery broker.
 Uses redis-py async client for non-blocking operations.
 """
 
+from typing import Any, cast
+
 import redis.asyncio as aioredis
 from redis.asyncio import Redis
 
@@ -20,10 +22,13 @@ def get_redis_client() -> Redis:
     global _redis_client
     if _redis_client is None:
         settings = get_settings()
-        _redis_client = aioredis.from_url(
-            settings.redis_url_str,
-            encoding="utf-8",
-            decode_responses=True,
+        _redis_client = cast(
+            Redis,
+            aioredis.from_url(  # type: ignore[no-untyped-call]
+                settings.redis_url_str,
+                encoding="utf-8",
+                decode_responses=True,
+            ),
         )
     return _redis_client
 
@@ -32,7 +37,7 @@ async def check_redis_connection() -> bool:
     """Health check — verifies Redis is reachable."""
     try:
         client = get_redis_client()
-        await client.ping()
+        await cast(Any, client.ping())
         return True
     except Exception as exc:
         logger.error("redis_connection_failed", error=str(exc))

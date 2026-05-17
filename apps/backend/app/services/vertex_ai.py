@@ -25,14 +25,14 @@ from __future__ import annotations
 
 import time
 from collections.abc import AsyncGenerator
-from typing import Any
+from typing import Any, cast
 
 from google import genai
 from google.genai import types
 from packages.agents.resilience import RetryPolicy
 from packages.observability.metrics import get_metrics
 
-from app.core.config import get_settings
+from app.core.config import Settings, get_settings
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -46,7 +46,7 @@ def _should_try_fallback(exc: Exception) -> bool:
     return any(p in msg for p in _FALLBACK_TRIGGER_PATTERNS)
 
 
-def _build_client(settings) -> genai.Client:
+def _build_client(settings: Settings) -> genai.Client:
     """
     Build a google-genai client.
 
@@ -154,7 +154,7 @@ class VertexAIService:
 
             response = await client.aio.models.generate_content(
                 model=model_name,
-                contents=contents,
+                contents=cast(Any, contents),
                 config=config,
             )
 
@@ -216,7 +216,7 @@ class VertexAIService:
         try:
             async for chunk in await client.aio.models.generate_content_stream(
                 model=self._model_name,
-                contents=contents,
+                contents=cast(Any, contents),
                 config=config,
             ):
                 if chunk.text:

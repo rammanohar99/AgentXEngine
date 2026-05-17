@@ -10,7 +10,7 @@ from logging.config import fileConfig
 
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from alembic import context
+from alembic import context  # type: ignore
 from app.core.config import get_settings
 from app.core.database import Base
 

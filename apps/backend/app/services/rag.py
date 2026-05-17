@@ -17,6 +17,8 @@ Design:
 
 from __future__ import annotations
 
+from typing import Any
+
 from packages.rag.chunker import Chunker
 from packages.rag.schemas import (
     Document,
@@ -48,7 +50,7 @@ class RAGService:
     def __init__(
         self,
         session: AsyncSession,
-        embedding_service: object,  # EmbeddingService — typed loosely to avoid import chain
+        embedding_service: Any,  # EmbeddingService — typed loosely to avoid import chain
         chunker: Chunker | None = None,
     ) -> None:
         self._session = session
@@ -56,7 +58,7 @@ class RAGService:
         self._chunker = chunker or Chunker(max_chunk_size=800, overlap=100)
         self._repo = DocumentRepository(session)
 
-    async def list_documents(self) -> list[dict]:
+    async def list_documents(self) -> list[dict[str, Any]]:
         """Return all ingested documents with chunk counts."""
         return await self._repo.list_documents()
 

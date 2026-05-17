@@ -6,6 +6,7 @@ This gives us confidence the sandbox logic actually works.
 """
 
 import pathlib
+from typing import Any
 
 import pytest
 from packages.agents.schemas import ToolCall
@@ -40,7 +41,7 @@ def workspace(tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch) -> pathli
     return tmp_path
 
 
-def _make_call(tool_name: str, **kwargs) -> ToolCall:
+def _make_call(tool_name: str, **kwargs: Any) -> ToolCall:
     return ToolCall(tool_name=tool_name, arguments=kwargs, call_id="test-call-id")
 
 

@@ -17,6 +17,7 @@ Usage (registered in main.py):
 from __future__ import annotations
 
 import time
+from typing import Any
 
 from fastapi import Request, Response, status
 from fastapi.responses import JSONResponse
@@ -40,7 +41,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
     def __init__(
         self,
-        app,
+        app: Any,
         requests_per_minute: int = 60,
         chat_requests_per_minute: int = 20,
     ) -> None:

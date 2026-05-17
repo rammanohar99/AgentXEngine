@@ -6,7 +6,7 @@ Startup will fail fast if required variables are missing.
 """
 
 from functools import lru_cache
-from typing import Literal
+from typing import Literal, cast
 
 from pydantic import Field, PostgresDsn, RedisDsn, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -33,11 +33,11 @@ class Settings(BaseSettings):
 
     # Database
     database_url: PostgresDsn = Field(
-        default="postgresql+asyncpg://postgres:postgres@localhost:5432/aiengos"
+        default=cast(PostgresDsn, "postgresql+asyncpg://postgres:postgres@localhost:5432/aiengos")
     )
 
     # Redis
-    redis_url: RedisDsn = Field(default="redis://localhost:6379/0")
+    redis_url: RedisDsn = Field(default=cast(RedisDsn, "redis://localhost:6379/0"))
 
     # Vertex AI / Google Gen AI
     google_cloud_project: str = Field(default="")

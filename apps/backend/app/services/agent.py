@@ -21,16 +21,19 @@ import asyncio
 import time
 import uuid
 from collections.abc import AsyncGenerator
+from typing import Any, cast
 
 from packages.agents.runtime import AgentRuntime, Message
 from packages.agents.schemas import AgentEventType
 from packages.agents.tool_registry import ToolRegistry
 from packages.memory.long_term import LongTermMemory
 from packages.memory.manager import MemoryManager
+from packages.memory.schemas import MemoryContext
 from packages.memory.short_term import ShortTermMemory
 from packages.memory.summarizer import MemorySummarizer
 from packages.observability.evaluation import AgentEvaluator
 from packages.observability.tracer import AgentTracer
+from redis.asyncio import Redis
 
 from app.core.config import Settings, get_settings
 from app.core.logging import get_logger
@@ -138,7 +141,7 @@ def _register_retrieval_tool(
             api_key=settings.gemini_api_key,  # Takes priority over project if set
         )
 
-        async def retriever(query: str, top_k: int) -> list[dict]:
+        async def retriever(query: str, top_k: int) -> list[dict[str, Any]]:
             """Retriever callable: embeds query and searches pgvector."""
             query_embedding = await embedding_service.embed_query(query)
             async with get_session_factory()() as session:
@@ -163,46 +166,50 @@ def _build_memory_manager() -> MemoryManager:
         long_term = LongTermMemory(redis_client=redis_client)
     except Exception:
         # Fallback: no-op long-term memory if Redis is unavailable
-        long_term = LongTermMemory(redis_client=_NoOpRedis())
+        long_term = LongTermMemory(redis_client=cast(Redis, _NoOpRedis()))
+
     summarizer = MemorySummarizer(llm_provider=vertex_service)
+
+    manager_redis_client: Redis | None = None
     try:
-        redis_client = get_redis_client()
+        manager_redis_client = get_redis_client()
     except Exception:
-        redis_client = None
+        manager_redis_client = None
+
     return MemoryManager(
         short_term=short_term,
         long_term=long_term,
         summarizer=summarizer,
-        redis_client=redis_client,
+        redis_client=manager_redis_client,
     )
 
 
 class _NoOpRedis:
     """Minimal Redis stub used when Redis is unavailable."""
 
-    async def lrange(self, *args, **kwargs):
+    async def lrange(self, *args: Any, **kwargs: Any) -> list[Any]:
         return []
 
-    async def rpush(self, *args, **kwargs):
+    async def rpush(self, *args: Any, **kwargs: Any) -> int:
         return 0
 
-    async def expire(self, *args, **kwargs):
+    async def expire(self, *args: Any, **kwargs: Any) -> bool:
+        return False
+
+    async def llen(self, *args: Any, **kwargs: Any) -> int:
         return 0
 
-    async def llen(self, *args, **kwargs):
+    async def ltrim(self, *args: Any, **kwargs: Any) -> bool:
+        return False
+
+    async def delete(self, *args: Any, **kwargs: Any) -> int:
         return 0
 
-    async def ltrim(self, *args, **kwargs):
-        return 0
-
-    async def delete(self, *args, **kwargs):
-        return 0
-
-    async def get(self, *args, **kwargs):
+    async def get(self, *args: Any, **kwargs: Any) -> Any:
         return None
 
-    async def set(self, *args, **kwargs):
-        return None
+    async def set(self, *args: Any, **kwargs: Any) -> bool:
+        return False
 
 
 # ── Service ───────────────────────────────────────────────────────────────────
@@ -267,7 +274,8 @@ class AgentService:
         steps_taken = 0
         tool_calls_made = 0
 
-        with _get_tracer().trace_run(session_id, run_id, request.message) as trace:
+        tracer = _get_tracer()
+        with tracer.trace_run(session_id, run_id, request.message) as trace:
             try:
                 async for event in _get_runtime().run(
                     session_id=session_id,
@@ -330,7 +338,7 @@ class AgentService:
     def _build_history_with_memory(
         self,
         history: list[ChatMessage],
-        memory_context,
+        memory_context: MemoryContext,
     ) -> list[Message]:
         """
         Build the message history for the runtime, prepending memory context

@@ -17,10 +17,9 @@ Compare runs:
     pytest-benchmark compare baseline
 """
 
-from __future__ import annotations
-
 import io
 import random
+from typing import Any
 
 import pytest
 from packages.agents.planner import Planner
@@ -70,7 +69,7 @@ def _lorem(words: int) -> str:
         "platform",
     ]
     rng = random.Random(42)  # fixed seed — deterministic
-    sentences = []
+    sentences: list[str] = []
     while sum(len(s.split()) for s in sentences) < words:
         length = rng.randint(8, 20)
         sentence = " ".join(rng.choice(vocab) for _ in range(length))
@@ -97,49 +96,49 @@ _DOC_LARGE = _lorem(50_000)  # ~300 KB — annual report / long PDF
 class TestChunkerBenchmarks:
     """Measures chunker throughput at different document sizes and chunk configs."""
 
-    def test_chunk_small_doc_default(self, benchmark: pytest.fixture) -> None:
+    def test_chunk_small_doc_default(self, benchmark: Any) -> None:
         """Small doc (~3KB) with default settings."""
         chunker = Chunker(max_chunk_size=800, overlap=100)
         doc = _make_doc(_DOC_SMALL)
         result = benchmark(chunker.chunk, doc)
         assert len(result) >= 1
 
-    def test_chunk_medium_doc_default(self, benchmark: pytest.fixture) -> None:
+    def test_chunk_medium_doc_default(self, benchmark: Any) -> None:
         """Medium doc (~30KB) with default settings."""
         chunker = Chunker(max_chunk_size=800, overlap=100)
         doc = _make_doc(_DOC_MEDIUM)
         result = benchmark(chunker.chunk, doc)
         assert len(result) > 5
 
-    def test_chunk_large_doc_default(self, benchmark: pytest.fixture) -> None:
+    def test_chunk_large_doc_default(self, benchmark: Any) -> None:
         """Large doc (~300KB) — simulates a 139-page annual report."""
         chunker = Chunker(max_chunk_size=800, overlap=100)
         doc = _make_doc(_DOC_LARGE)
         result = benchmark(chunker.chunk, doc)
         assert len(result) > 50
 
-    def test_chunk_large_doc_small_chunks(self, benchmark: pytest.fixture) -> None:
+    def test_chunk_large_doc_small_chunks(self, benchmark: Any) -> None:
         """Large doc with small chunks — maximum granularity."""
         chunker = Chunker(max_chunk_size=400, overlap=50)
         doc = _make_doc(_DOC_LARGE)
         result = benchmark(chunker.chunk, doc)
         assert len(result) > 100
 
-    def test_chunk_large_doc_large_chunks(self, benchmark: pytest.fixture) -> None:
+    def test_chunk_large_doc_large_chunks(self, benchmark: Any) -> None:
         """Large doc with large chunks — minimum granularity."""
         chunker = Chunker(max_chunk_size=2000, overlap=200)
         doc = _make_doc(_DOC_LARGE)
         result = benchmark(chunker.chunk, doc)
         assert len(result) > 10
 
-    def test_chunk_no_overlap(self, benchmark: pytest.fixture) -> None:
+    def test_chunk_no_overlap(self, benchmark: Any) -> None:
         """Chunking without overlap — baseline for overlap cost."""
         chunker = Chunker(max_chunk_size=800, overlap=1)
         doc = _make_doc(_DOC_MEDIUM)
         result = benchmark(chunker.chunk, doc)
         assert len(result) >= 1
 
-    def test_chunk_single_giant_paragraph(self, benchmark: pytest.fixture) -> None:
+    def test_chunk_single_giant_paragraph(self, benchmark: Any) -> None:
         """Worst case: one paragraph with no double newlines — forces sentence splitting."""
         content = " ".join(["word"] * 10_000)  # ~50KB, no paragraph breaks
         chunker = Chunker(max_chunk_size=800, overlap=100)
@@ -159,7 +158,7 @@ class TestPlannerBenchmarks:
         registry = ToolRegistry.with_defaults()
         self.planner = Planner(registry)
 
-    def test_parse_final_answer(self, benchmark: pytest.fixture) -> None:
+    def test_parse_final_answer(self, benchmark: Any) -> None:
         """Parse a clean Final Answer response."""
         output = (
             "Thought: I have all the information needed to answer the question.\n"
@@ -171,7 +170,7 @@ class TestPlannerBenchmarks:
 
         assert result.decision_type == DecisionType.FINAL_ANSWER
 
-    def test_parse_tool_call_json(self, benchmark: pytest.fixture) -> None:
+    def test_parse_tool_call_json(self, benchmark: Any) -> None:
         """Parse a tool call with valid JSON arguments."""
         output = (
             "Thought: I need to search for the sales data in the documents.\n"
@@ -185,7 +184,7 @@ class TestPlannerBenchmarks:
         assert result.tool_call is not None
         assert result.tool_call.tool_name == "read_file"
 
-    def test_parse_tool_call_python_dict(self, benchmark: pytest.fixture) -> None:
+    def test_parse_tool_call_python_dict(self, benchmark: Any) -> None:
         """Parse a tool call with Python dict syntax (single quotes) — common LLM output."""
         output = (
             "Thought: Let me look up the document.\n"
@@ -199,7 +198,7 @@ class TestPlannerBenchmarks:
         assert result.tool_call is not None
         assert result.tool_call.tool_name == "search_files"
 
-    def test_parse_long_reasoning(self, benchmark: pytest.fixture) -> None:
+    def test_parse_long_reasoning(self, benchmark: Any) -> None:
         """Parse output with verbose multi-line reasoning."""
         reasoning = " ".join(["I need to think carefully about this."] * 50)
         output = f"Thought: {reasoning}\n" "Final Answer: Based on my analysis, the answer is 42."
@@ -208,7 +207,7 @@ class TestPlannerBenchmarks:
 
         assert result.decision_type == DecisionType.FINAL_ANSWER
 
-    def test_parse_fallback_unformatted(self, benchmark: pytest.fixture) -> None:
+    def test_parse_fallback_unformatted(self, benchmark: Any) -> None:
         """Parse completely unformatted LLM output — fallback path."""
         output = _lorem(200)
         result = benchmark(self.planner.parse, output)
@@ -226,19 +225,19 @@ class TestEmbeddingBatchBenchmarks:
     These run before any API call — their latency adds to every ingest.
     """
 
-    def test_estimate_tokens_short(self, benchmark: pytest.fixture) -> None:
+    def test_estimate_tokens_short(self, benchmark: Any) -> None:
         """Token estimation for a short chunk (~200 chars)."""
         text = _lorem(40)
         result = benchmark(_estimate_tokens, text)
         assert result > 0
 
-    def test_estimate_tokens_long(self, benchmark: pytest.fixture) -> None:
+    def test_estimate_tokens_long(self, benchmark: Any) -> None:
         """Token estimation for a long chunk (~2000 chars)."""
         text = _lorem(400)
         result = benchmark(_estimate_tokens, text)
         assert result > 0
 
-    def test_batch_planning_small(self, benchmark: pytest.fixture) -> None:
+    def test_batch_planning_small(self, benchmark: Any) -> None:
         """Batch planning for a small document (10 chunks)."""
         chunker = Chunker(max_chunk_size=800, overlap=100)
         chunks = chunker.chunk(_make_doc(_DOC_SMALL))
@@ -246,7 +245,7 @@ class TestEmbeddingBatchBenchmarks:
         result = benchmark(_build_token_aware_batches, texts)
         assert len(result) >= 1
 
-    def test_batch_planning_medium(self, benchmark: pytest.fixture) -> None:
+    def test_batch_planning_medium(self, benchmark: Any) -> None:
         """Batch planning for a medium document (~50 chunks)."""
         chunker = Chunker(max_chunk_size=800, overlap=100)
         chunks = chunker.chunk(_make_doc(_DOC_MEDIUM))
@@ -254,7 +253,7 @@ class TestEmbeddingBatchBenchmarks:
         result = benchmark(_build_token_aware_batches, texts)
         assert len(result) >= 1
 
-    def test_batch_planning_large(self, benchmark: pytest.fixture) -> None:
+    def test_batch_planning_large(self, benchmark: Any) -> None:
         """Batch planning for a large document (~400 chunks) — annual report scale."""
         chunker = Chunker(max_chunk_size=800, overlap=100)
         chunks = chunker.chunk(_make_doc(_DOC_LARGE))
@@ -263,7 +262,7 @@ class TestEmbeddingBatchBenchmarks:
         # Should split into multiple batches
         assert len(result) >= 2
 
-    def test_batch_planning_respects_token_limit(self, benchmark: pytest.fixture) -> None:
+    def test_batch_planning_respects_token_limit(self, benchmark: Any) -> None:
         """Verify no batch exceeds the token limit."""
         from packages.rag.embeddings import _MAX_TOKENS_PER_BATCH
 
@@ -271,7 +270,7 @@ class TestEmbeddingBatchBenchmarks:
         chunks = chunker.chunk(_make_doc(_DOC_LARGE))
         texts = [c.text for c in chunks]
 
-        def plan_and_verify() -> list:
+        def plan_and_verify() -> list[list[str]]:
             batches = _build_token_aware_batches(texts)
             for batch in batches:
                 total = sum(_estimate_tokens(t) for t in batch)
@@ -329,7 +328,7 @@ class TestExtractorBenchmarks:
         wb.save(buf)
         return buf.getvalue()
 
-    def test_extract_csv_small(self, benchmark: pytest.fixture) -> None:
+    def test_extract_csv_small(self, benchmark: Any) -> None:
         """Extract a small CSV (50 rows)."""
         from packages.rag.extractor import extract_text
 
@@ -338,7 +337,7 @@ class TestExtractorBenchmarks:
         assert "Project" in result
         assert len(result) > 100
 
-    def test_extract_csv_large(self, benchmark: pytest.fixture) -> None:
+    def test_extract_csv_large(self, benchmark: Any) -> None:
         """Extract a large CSV (1000 rows)."""
         from packages.rag.extractor import extract_text
 
@@ -346,7 +345,7 @@ class TestExtractorBenchmarks:
         result = benchmark(extract_text, data, "data.csv")
         assert "Project" in result
 
-    def test_extract_excel_small(self, benchmark: pytest.fixture) -> None:
+    def test_extract_excel_small(self, benchmark: Any) -> None:
         """Extract a small Excel workbook (50 rows)."""
         from packages.rag.extractor import extract_text
 
@@ -354,7 +353,7 @@ class TestExtractorBenchmarks:
         result = benchmark(extract_text, data, "data.xlsx")
         assert "Project" in result
 
-    def test_extract_excel_large(self, benchmark: pytest.fixture) -> None:
+    def test_extract_excel_large(self, benchmark: Any) -> None:
         """Extract a large Excel workbook (500 rows)."""
         from packages.rag.extractor import extract_text
 

@@ -4,19 +4,24 @@ Retrieval tool unit tests.
 The retriever callable is mocked — no database or embedding service needed.
 """
 
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 import pytest
 from packages.agents.schemas import ToolCall
 from packages.agents.tools.retrieval import RetrieveDocumentsTool
 
 
-def _make_call(tool_name: str, **kwargs) -> ToolCall:
+def _make_call(tool_name: str, **kwargs: Any) -> ToolCall:
     return ToolCall(tool_name=tool_name, arguments=kwargs, call_id="test-id")
 
 
-def _make_mock_retriever(results: list[dict]) -> object:
+def _make_mock_retriever(
+    results: list[dict[str, Any]]
+) -> Callable[[str, int], Awaitable[list[dict[str, Any]]]]:
     """Return an async callable that returns the given results."""
 
-    async def retriever(query: str, top_k: int) -> list[dict]:
+    async def retriever(query: str, top_k: int) -> list[dict[str, Any]]:
         return results[:top_k]
 
     return retriever
@@ -72,7 +77,7 @@ async def test_retrieval_tool_respects_top_k() -> None:
     ]
     captured_top_k: list[int] = []
 
-    async def tracking_retriever(query: str, top_k: int) -> list[dict]:
+    async def tracking_retriever(query: str, top_k: int) -> list[dict[str, Any]]:
         captured_top_k.append(top_k)
         return results[:top_k]
 
@@ -87,7 +92,7 @@ async def test_retrieval_tool_clamps_top_k() -> None:
     """top_k should be clamped to [1, 10]."""
     captured: list[int] = []
 
-    async def tracking_retriever(query: str, top_k: int) -> list[dict]:
+    async def tracking_retriever(query: str, top_k: int) -> list[dict[str, Any]]:
         captured.append(top_k)
         return []
 
@@ -104,7 +109,7 @@ async def test_retrieval_tool_clamps_top_k() -> None:
 async def test_retrieval_tool_default_top_k() -> None:
     captured: list[int] = []
 
-    async def tracking_retriever(query: str, top_k: int) -> list[dict]:
+    async def tracking_retriever(query: str, top_k: int) -> list[dict[str, Any]]:
         captured.append(top_k)
         return []
 

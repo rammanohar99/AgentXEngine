@@ -2,12 +2,14 @@
 Terminal tool tests — validates the allowlist and command execution.
 """
 
+from typing import Any
+
 import pytest
 from packages.agents.schemas import ToolCall
 from packages.agents.tools.terminal import TerminalTool, _is_permitted
 
 
-def _make_call(**kwargs) -> ToolCall:
+def _make_call(**kwargs: Any) -> ToolCall:
     return ToolCall(tool_name="terminal", arguments=kwargs, call_id="test")
 
 

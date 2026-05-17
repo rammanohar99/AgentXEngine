@@ -12,6 +12,7 @@ The SSE stream emits JSON-encoded StreamChunk objects.
 Chunk types: text | reasoning | tool_call | tool_result | done | error
 """
 
+from collections.abc import AsyncGenerator
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -68,7 +69,7 @@ async def stream_chat(
       error       — display error, close stream
     """
 
-    async def event_generator():
+    async def event_generator() -> AsyncGenerator[str, None]:
         try:
             async for chunk in service.stream_chat(request):
                 yield f"data: {chunk.model_dump_json()}\n\n"

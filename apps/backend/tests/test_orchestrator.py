@@ -7,6 +7,8 @@ and workflow execution without real API calls.
 
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
 from packages.agents.agent_types import AgentRole, get_agent_config
 from packages.agents.orchestrator import Orchestrator
@@ -16,12 +18,14 @@ from packages.agents.tool_registry import ToolRegistry
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
 
-def _make_vertex_mock(responses: list[str]):
+def _make_vertex_mock(responses: list[str]) -> Any:
     """Mock LLM that returns responses in sequence."""
     call_count = 0
 
     class MockLLM:
-        async def complete(self, messages, temperature=0.1, **kwargs):
+        async def complete(
+            self, messages: list[Any], temperature: float = 0.1, **kwargs: Any
+        ) -> Any:
             nonlocal call_count
             text = responses[min(call_count, len(responses) - 1)]
             call_count += 1
@@ -31,8 +35,8 @@ def _make_vertex_mock(responses: list[str]):
     return MockLLM()
 
 
-async def _collect_events(orchestrator: Orchestrator, message: str) -> list:
-    events = []
+async def _collect_events(orchestrator: Orchestrator, message: str) -> list[Any]:
+    events: list[Any] = []
     async for event in orchestrator.run(
         session_id="test-session",
         history=[],
@@ -343,28 +347,28 @@ async def test_adr003_memory_summarization_failure_does_not_crash_run() -> None:
             raise RuntimeError("Summarization LLM call failed")
 
     class MockRedis:
-        async def lrange(self, *a, **k):
+        async def lrange(self, *a: Any, **k: Any) -> list[Any]:
             return []
 
-        async def rpush(self, *a, **k):
+        async def rpush(self, *a: Any, **k: Any) -> int:
             return 0
 
-        async def expire(self, *a, **k):
+        async def expire(self, *a: Any, **k: Any) -> int:
             return 0
 
-        async def llen(self, *a, **k):
+        async def llen(self, *a: Any, **k: Any) -> int:
             return 0
 
-        async def ltrim(self, *a, **k):
+        async def ltrim(self, *a: Any, **k: Any) -> int:
             return 0
 
-        async def delete(self, *a, **k):
+        async def delete(self, *a: Any, **k: Any) -> int:
             return 0
 
-        async def get(self, *a, **k):
+        async def get(self, *a: Any, **k: Any) -> Any:
             return None
 
-        async def set(self, *a, **k):
+        async def set(self, *a: Any, **k: Any) -> Any:
             return None
 
     short_term = ShortTermMemory(window_size=50)

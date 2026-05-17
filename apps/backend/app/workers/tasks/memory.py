@@ -13,12 +13,14 @@ import asyncio
 import logging
 from typing import Any
 
+from celery import Task
+
 from app.workers.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
 
 
-@celery_app.task(
+@celery_app.task(  # type: ignore
     name="memory.summarize_session",
     bind=True,
     max_retries=2,
@@ -26,7 +28,7 @@ logger = logging.getLogger(__name__)
     acks_late=True,
 )
 def summarize_session_memory(
-    self,
+    self: Task,
     session_id: str,
     turns: list[dict[str, Any]],
 ) -> dict[str, Any]:

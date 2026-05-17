@@ -20,12 +20,14 @@ import asyncio
 import logging
 from typing import Any
 
+from celery import Task
+
 from app.workers.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
 
 
-@celery_app.task(
+@celery_app.task(  # type: ignore
     name="ingestion.ingest_document",
     bind=True,
     max_retries=3,
@@ -33,7 +35,7 @@ logger = logging.getLogger(__name__)
     acks_late=True,
 )
 def ingest_document(
-    self,
+    self: Task,
     content: str,
     metadata: dict[str, Any],
 ) -> dict[str, Any]:
