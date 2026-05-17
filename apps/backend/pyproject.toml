@@ -1,0 +1,66 @@
+[project]
+name = "backend"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.115.5",
+    "uvicorn[standard]==0.32.1",
+    "pydantic==2.10.3",
+    "pydantic-settings==2.6.1",
+    "python-dotenv==1.0.1",
+    "httpx==0.28.1",
+    "google-genai==1.16.0",
+    "sqlalchemy[asyncio]==2.0.36",
+    "asyncpg==0.30.0",
+    "alembic==1.14.0",
+    "redis[hiredis]==5.2.1",
+    "celery==5.4.0",
+    "structlog==24.4.0",
+    "opentelemetry-api==1.29.0",
+    "opentelemetry-sdk==1.29.0",
+    "opentelemetry-instrumentation-fastapi==0.50b0",
+    "langfuse==2.57.4",
+    "tenacity==9.0.0",
+    "pgvector==0.3.6",
+    "pypdf==5.1.0",
+    "python-multipart==0.0.20",
+    "openpyxl==3.1.5",
+    "Pillow==11.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.4",
+    "pytest-asyncio==0.24.0",
+    "pytest-httpx==0.35.0",
+    "pytest-benchmark==4.0.0",
+    "ruff==0.8.4",
+    "black==24.10.0",
+    "mypy==1.13.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+# Make packages/ importable during tests (monorepo root is two levels up)
+pythonpath = [".", "../.."]
+# Suppress expected warnings in test runs
+filterwarnings = [
+    "ignore::UserWarning:pydantic",
+]

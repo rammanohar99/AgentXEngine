@@ -1,0 +1,75 @@
+# ── Secrets ──────────────────────────────────────────────────────────────────
+.env
+*.env
+!.env.example
+
+# ── Python bytecode ───────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ── Virtual environments ──────────────────────────────────────────────────────
+.venv/
+.venv*/
+venv/
+env/
+ENV/
+
+# ── Build / distribution ──────────────────────────────────────────────────────
+dist/
+build/
+*.egg-info/
+*.egg
+*.whl
+MANIFEST
+
+# ── uv / pip ──────────────────────────────────────────────────────────────────
+.uv/
+uv.lock
+
+# ── Alembic generated migrations (keep .gitkeep placeholder) ─────────────────
+alembic/versions/*.py
+!alembic/versions/.gitkeep
+
+# ── Test & coverage artifacts ─────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+nosetests.xml
+pytest.xml
+
+# ── Type checking & linting caches ───────────────────────────────────────────
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.pyre/
+
+# ── Benchmark outputs ─────────────────────────────────────────────────────────
+.benchmarks/
+
+# ── Logs ──────────────────────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Google Cloud / GCP credentials ───────────────────────────────────────────
+service-account*.json
+gcp-credentials*.json
+application_default_credentials.json
+*.pem
+*.key
+*-keyfile.json
+
+# ── IDE ───────────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── OS ────────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db

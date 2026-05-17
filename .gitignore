@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+*.egg
+*.whl
+dist/
+build/
+.venv/
+.venv*/
+venv/
+env/
+ENV/
+.env
+*.env
+!**/.env.example
+
+# Alembic
+alembic/versions/*.py
+!alembic/versions/.gitkeep
+
+# Node
+node_modules/
+dist/
+.next/
+.nuxt/
+*.local
+
+# Vite
+apps/frontend/dist/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Docker
+.docker/
+
+# Secrets — never commit these
+*.pem
+*.key
+service-account*.json
+gcp-credentials*.json
+application_default_credentials.json
+*-keyfile.json
+
+# Test artifacts
+.pytest_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Benchmark outputs
+.benchmarks/
+apps/backend/.benchmarks/
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db
