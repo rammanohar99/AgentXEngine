@@ -47,9 +47,7 @@ async def test_executor_returns_failure_for_unknown_tool(executor: Executor) -> 
 
 
 @pytest.mark.asyncio
-async def test_executor_records_duration(
-    workspace: pathlib.Path, executor: Executor
-) -> None:
+async def test_executor_records_duration(workspace: pathlib.Path, executor: Executor) -> None:
     call = ToolCall(tool_name="list_directory", arguments={"path": "."}, call_id="dur")
     result = await executor.execute(call)
     assert result.duration_ms >= 0

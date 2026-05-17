@@ -155,6 +155,7 @@ async def upload_document(
             # Use Gemini Vision for OCR — no Tesseract system dependency needed
             settings = get_settings()
             from google import genai as _genai
+
             if settings.gemini_api_key:
                 gemini_client = _genai.Client(api_key=settings.gemini_api_key)
             else:

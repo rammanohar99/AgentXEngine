@@ -55,6 +55,7 @@ async def _collect_events(runtime: AgentRuntime, message: str) -> list:
         events.append(event)
     return events
 
+
 # ── Tests ─────────────────────────────────────────────────────────────────────
 
 
@@ -98,8 +99,7 @@ async def test_tool_call_then_final_answer(
         'Action Input: {"path": "answer.txt"}'
     )
     final_answer_response = (
-        "Thought: The file contains the answer.\n"
-        "Final Answer: The answer is 42."
+        "Thought: The file contains the answer.\n" "Final Answer: The answer is 42."
     )
 
     vertex_mock = _make_vertex_mock([tool_call_response, final_answer_response])

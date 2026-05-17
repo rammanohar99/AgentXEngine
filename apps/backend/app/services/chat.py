@@ -48,9 +48,7 @@ class ChatService:
 
         # Dynamically inject system prompt
         messages = (
-            [ChatMessage(role=MessageRole.SYSTEM, content=SYSTEM_PROMPT)]
-            + history
-            + [user_message]
+            [ChatMessage(role=MessageRole.SYSTEM, content=SYSTEM_PROMPT)] + history + [user_message]
         )
 
         response = await self._vertex.complete(messages=messages)
@@ -79,17 +77,13 @@ class ChatService:
         user_message = ChatMessage(role=MessageRole.USER, content=request.message)
         SessionManager.append_message(session_id, user_message)
 
-        logger.info(
-            "chat_stream_start", session_id=session_id, message_length=len(request.message)
-        )
+        logger.info("chat_stream_start", session_id=session_id, message_length=len(request.message))
 
         full_response = ""
 
         # Dynamically inject system prompt
         messages = (
-            [ChatMessage(role=MessageRole.SYSTEM, content=SYSTEM_PROMPT)]
-            + history
-            + [user_message]
+            [ChatMessage(role=MessageRole.SYSTEM, content=SYSTEM_PROMPT)] + history + [user_message]
         )
 
         async for text_chunk in self._vertex.stream(messages=messages):

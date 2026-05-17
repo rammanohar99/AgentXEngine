@@ -135,9 +135,7 @@ async def test_search_files_finds_pattern(workspace: pathlib.Path) -> None:
 @pytest.mark.asyncio
 async def test_search_files_with_file_pattern(workspace: pathlib.Path) -> None:
     tool = SearchFilesTool()
-    result = await tool.execute(
-        _make_call("search_files", pattern="import", file_pattern="*.py")
-    )
+    result = await tool.execute(_make_call("search_files", pattern="import", file_pattern="*.py"))
     assert result.success is True
     assert "main.py" in result.output
 

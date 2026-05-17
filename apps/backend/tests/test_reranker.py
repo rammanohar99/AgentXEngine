@@ -103,6 +103,7 @@ async def test_reranker_timeout() -> None:
     assert len(reranked) == 1
     assert reranked[0].score == pytest.approx(0.5)
 
+
 @pytest.mark.asyncio
 async def test_reranker_bounded_concurrency() -> None:
     class TrackingLLM:
@@ -121,22 +122,22 @@ async def test_reranker_bounded_concurrency() -> None:
     # 5 items to score, max_concurrent=2
     results = [_make_result(f"Text {i}", 0.8) for i in range(5)]
     reranker = Reranker(llm_provider=llm, max_concurrent=2)
-    
+
     await reranker.rerank("query", results)
-    
+
     # Should never exceed 2 concurrent calls
     assert llm.max_concurrent_calls <= 2
+
 
 @pytest.mark.asyncio
 async def test_reranker_observability_logging() -> None:
     import structlog
-    
+
     results = [_make_result("Text", 0.8)]
     reranker = Reranker(llm_provider=MockLLM(scores=[0.9]))
-    
+
     with structlog.testing.capture_logs() as cap_logs:
         await reranker.rerank("query", results)
-    
+
     # Ensure the metric event is emitted
     assert any(log.get("event") == "metric.rag_reranker" for log in cap_logs)
-

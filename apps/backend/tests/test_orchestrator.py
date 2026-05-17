@@ -338,18 +338,34 @@ async def test_adr003_memory_summarization_failure_does_not_crash_run() -> None:
 
     class ExplodingSummarizer:
         """Summarizer that always raises — simulates LLM failure during summarization."""
+
         async def summarize(self, session_id, turns):
             raise RuntimeError("Summarization LLM call failed")
 
     class MockRedis:
-        async def lrange(self, *a, **k): return []
-        async def rpush(self, *a, **k): return 0
-        async def expire(self, *a, **k): return 0
-        async def llen(self, *a, **k): return 0
-        async def ltrim(self, *a, **k): return 0
-        async def delete(self, *a, **k): return 0
-        async def get(self, *a, **k): return None
-        async def set(self, *a, **k): return None
+        async def lrange(self, *a, **k):
+            return []
+
+        async def rpush(self, *a, **k):
+            return 0
+
+        async def expire(self, *a, **k):
+            return 0
+
+        async def llen(self, *a, **k):
+            return 0
+
+        async def ltrim(self, *a, **k):
+            return 0
+
+        async def delete(self, *a, **k):
+            return 0
+
+        async def get(self, *a, **k):
+            return None
+
+        async def set(self, *a, **k):
+            return None
 
     short_term = ShortTermMemory(window_size=50)
     long_term = LongTermMemory(redis_client=MockRedis())

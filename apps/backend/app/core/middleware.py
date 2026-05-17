@@ -33,12 +33,13 @@ class CorrelationIDMiddleware(BaseHTTPMiddleware):
 
         # Bind to structlog context — all logs in this request will include it
         structlog.contextvars.clear_contextvars()
-        
+
         context_vars = {"correlation_id": correlation_id}
-        
+
         # Inject correlation_id into OTEL span, and grab trace_id for structlog
         try:
             from opentelemetry import trace
+
             span = trace.get_current_span()
             if span.is_recording():
                 span.set_attribute("correlation_id", correlation_id)

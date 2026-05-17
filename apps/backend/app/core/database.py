@@ -29,6 +29,7 @@ logger = get_logger(__name__)
 
 class Base(DeclarativeBase):
     """Base class for all SQLAlchemy ORM models."""
+
     pass
 
 

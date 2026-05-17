@@ -43,6 +43,7 @@ class ChatResponse(BaseModel):
 
 class StreamChunk(BaseModel):
     """A single chunk in a streaming response."""
+
     type: str  # "text" | "tool_call" | "tool_result" | "done" | "error"
     content: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)

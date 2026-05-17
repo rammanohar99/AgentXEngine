@@ -364,9 +364,7 @@ async def test_runtime_surfaces_timeout_as_error_event() -> None:
 
 
 @pytest.mark.asyncio
-async def test_runtime_tool_timeout_continues_loop(
-    tmp_path, monkeypatch
-) -> None:
+async def test_runtime_tool_timeout_continues_loop(tmp_path, monkeypatch) -> None:
     """A tool timeout produces a failed ToolResult, not a crash."""
     monkeypatch.setenv("AGENT_WORKSPACE_ROOT", str(tmp_path))
 

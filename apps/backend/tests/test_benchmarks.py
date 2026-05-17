@@ -43,10 +43,31 @@ def _make_doc(content: str, source: str = "bench.txt") -> Document:
 def _lorem(words: int) -> str:
     """Generate deterministic pseudo-text of roughly `words` words."""
     vocab = [
-        "the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog",
-        "revenue", "growth", "market", "analysis", "product", "customer",
-        "service", "financial", "report", "annual", "quarterly", "data",
-        "performance", "strategy", "investment", "technology", "platform",
+        "the",
+        "quick",
+        "brown",
+        "fox",
+        "jumps",
+        "over",
+        "lazy",
+        "dog",
+        "revenue",
+        "growth",
+        "market",
+        "analysis",
+        "product",
+        "customer",
+        "service",
+        "financial",
+        "report",
+        "annual",
+        "quarterly",
+        "data",
+        "performance",
+        "strategy",
+        "investment",
+        "technology",
+        "platform",
     ]
     rng = random.Random(42)  # fixed seed — deterministic
     sentences = []
@@ -65,9 +86,9 @@ def _lorem(words: int) -> str:
 
 
 # Pre-build documents at different sizes so fixture setup isn't counted
-_DOC_SMALL = _lorem(500)       # ~3 KB  — typical short article
-_DOC_MEDIUM = _lorem(5_000)    # ~30 KB — typical report page
-_DOC_LARGE = _lorem(50_000)    # ~300 KB — annual report / long PDF
+_DOC_SMALL = _lorem(500)  # ~3 KB  — typical short article
+_DOC_MEDIUM = _lorem(5_000)  # ~30 KB — typical report page
+_DOC_LARGE = _lorem(50_000)  # ~300 KB — annual report / long PDF
 
 
 # ── Chunker benchmarks ────────────────────────────────────────────────────────
@@ -147,17 +168,19 @@ class TestPlannerBenchmarks:
         )
         result = benchmark(self.planner.parse, output)
         from packages.agents.schemas import DecisionType
+
         assert result.decision_type == DecisionType.FINAL_ANSWER
 
     def test_parse_tool_call_json(self, benchmark: pytest.fixture) -> None:
         """Parse a tool call with valid JSON arguments."""
         output = (
-            'Thought: I need to search for the sales data in the documents.\n'
-            'Action: read_file\n'
+            "Thought: I need to search for the sales data in the documents.\n"
+            "Action: read_file\n"
             'Action Input: {"path": "apps/backend/app/main.py"}'
         )
         result = benchmark(self.planner.parse, output)
         from packages.agents.schemas import DecisionType
+
         assert result.decision_type == DecisionType.TOOL_CALL
         assert result.tool_call is not None
         assert result.tool_call.tool_name == "read_file"
@@ -171,6 +194,7 @@ class TestPlannerBenchmarks:
         )
         result = benchmark(self.planner.parse, output)
         from packages.agents.schemas import DecisionType
+
         assert result.decision_type == DecisionType.TOOL_CALL
         assert result.tool_call is not None
         assert result.tool_call.tool_name == "search_files"
@@ -178,12 +202,10 @@ class TestPlannerBenchmarks:
     def test_parse_long_reasoning(self, benchmark: pytest.fixture) -> None:
         """Parse output with verbose multi-line reasoning."""
         reasoning = " ".join(["I need to think carefully about this."] * 50)
-        output = (
-            f"Thought: {reasoning}\n"
-            "Final Answer: Based on my analysis, the answer is 42."
-        )
+        output = f"Thought: {reasoning}\n" "Final Answer: Based on my analysis, the answer is 42."
         result = benchmark(self.planner.parse, output)
         from packages.agents.schemas import DecisionType
+
         assert result.decision_type == DecisionType.FINAL_ANSWER
 
     def test_parse_fallback_unformatted(self, benchmark: pytest.fixture) -> None:
@@ -191,6 +213,7 @@ class TestPlannerBenchmarks:
         output = _lorem(200)
         result = benchmark(self.planner.parse, output)
         from packages.agents.schemas import DecisionType
+
         assert result.decision_type == DecisionType.FINAL_ANSWER
 
 
@@ -243,6 +266,7 @@ class TestEmbeddingBatchBenchmarks:
     def test_batch_planning_respects_token_limit(self, benchmark: pytest.fixture) -> None:
         """Verify no batch exceeds the token limit."""
         from packages.rag.embeddings import _MAX_TOKENS_PER_BATCH
+
         chunker = Chunker(max_chunk_size=800, overlap=100)
         chunks = chunker.chunk(_make_doc(_DOC_LARGE))
         texts = [c.text for c in chunks]
@@ -281,6 +305,7 @@ class TestExtractorBenchmarks:
     def _make_xlsx_bytes(self, rows: int) -> bytes:
         """Generate an Excel workbook with `rows` data rows."""
         import openpyxl
+
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Data"
@@ -289,15 +314,17 @@ class TestExtractorBenchmarks:
         names = ["Alice", "Bob", "Charlie", "Diana", "Ethan"]
         tasks = ["Research", "Development", "Testing", "Review", "Deployment"]
         for i in range(rows):
-            ws.append([
-                f"Project{i % 5}",
-                rng.choice(tasks),
-                rng.choice(names),
-                f"2024-01-{(i % 28) + 1:02d}",
-                rng.randint(5, 30),
-                f"2024-02-{(i % 28) + 1:02d}",
-                f"{rng.randint(0, 100)}%",
-            ])
+            ws.append(
+                [
+                    f"Project{i % 5}",
+                    rng.choice(tasks),
+                    rng.choice(names),
+                    f"2024-01-{(i % 28) + 1:02d}",
+                    rng.randint(5, 30),
+                    f"2024-02-{(i % 28) + 1:02d}",
+                    f"{rng.randint(0, 100)}%",
+                ]
+            )
         buf = io.BytesIO()
         wb.save(buf)
         return buf.getvalue()
@@ -305,6 +332,7 @@ class TestExtractorBenchmarks:
     def test_extract_csv_small(self, benchmark: pytest.fixture) -> None:
         """Extract a small CSV (50 rows)."""
         from packages.rag.extractor import extract_text
+
         data = self._make_csv_bytes(50)
         result = benchmark(extract_text, data, "data.csv")
         assert "Project" in result
@@ -313,6 +341,7 @@ class TestExtractorBenchmarks:
     def test_extract_csv_large(self, benchmark: pytest.fixture) -> None:
         """Extract a large CSV (1000 rows)."""
         from packages.rag.extractor import extract_text
+
         data = self._make_csv_bytes(1000)
         result = benchmark(extract_text, data, "data.csv")
         assert "Project" in result
@@ -320,6 +349,7 @@ class TestExtractorBenchmarks:
     def test_extract_excel_small(self, benchmark: pytest.fixture) -> None:
         """Extract a small Excel workbook (50 rows)."""
         from packages.rag.extractor import extract_text
+
         data = self._make_xlsx_bytes(50)
         result = benchmark(extract_text, data, "data.xlsx")
         assert "Project" in result
@@ -327,6 +357,7 @@ class TestExtractorBenchmarks:
     def test_extract_excel_large(self, benchmark: pytest.fixture) -> None:
         """Extract a large Excel workbook (500 rows)."""
         from packages.rag.extractor import extract_text
+
         data = self._make_xlsx_bytes(500)
         result = benchmark(extract_text, data, "data.xlsx")
         assert "Project" in result

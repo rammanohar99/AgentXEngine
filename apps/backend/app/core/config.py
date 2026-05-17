@@ -55,16 +55,16 @@ class Settings(BaseSettings):
     secret_key: str = Field(default="change-me-in-production-use-strong-random-key")
 
     # Reliability — timeouts and circuit breakers
-    llm_timeout_seconds: float = 60.0          # Max time for a single LLM call
-    tool_timeout_seconds: float = 30.0          # Max time for a single tool execution
-    agent_run_timeout_seconds: float = 300.0    # Max time for a complete agent run
+    llm_timeout_seconds: float = 60.0  # Max time for a single LLM call
+    tool_timeout_seconds: float = 30.0  # Max time for a single tool execution
+    agent_run_timeout_seconds: float = 300.0  # Max time for a complete agent run
     circuit_breaker_failure_threshold: int = 5  # Failures before circuit opens
     circuit_breaker_recovery_seconds: float = 60.0  # Time before circuit half-opens
 
     # Context engineering
-    max_context_tokens: int = 100_000           # Token budget per LLM call
-    max_tool_output_chars: int = 8_000          # Truncate tool outputs beyond this
-    max_history_messages: int = 50              # Cap conversation history length
+    max_context_tokens: int = 100_000  # Token budget per LLM call
+    max_tool_output_chars: int = 8_000  # Truncate tool outputs beyond this
+    max_history_messages: int = 50  # Cap conversation history length
 
     @field_validator("google_cloud_project")
     @classmethod

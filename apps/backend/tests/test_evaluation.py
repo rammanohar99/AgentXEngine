@@ -63,12 +63,18 @@ def test_evaluate_rag_retrieval_with_results() -> None:
 
     results = [
         RetrievalResult(
-            chunk_id="c1", document_id="d1", text="FastAPI docs",
-            score=0.92, metadata=DocumentMetadata()
+            chunk_id="c1",
+            document_id="d1",
+            text="FastAPI docs",
+            score=0.92,
+            metadata=DocumentMetadata(),
         ),
         RetrievalResult(
-            chunk_id="c2", document_id="d1", text="More FastAPI",
-            score=0.85, metadata=DocumentMetadata()
+            chunk_id="c2",
+            document_id="d1",
+            text="More FastAPI",
+            score=0.85,
+            metadata=DocumentMetadata(),
         ),
     ]
     metrics = evaluate_rag_retrieval(
@@ -108,6 +114,6 @@ async def test_evaluator_clamps_scores_to_valid_range() -> None:
     evaluator = AgentEvaluator(llm_provider=MockLLM())
     # 1.5 gets clamped to 1.0; -0.2 can't be parsed by regex (no negative match) → fallback 0.5
     score = evaluator._parse_scores("relevance: 1.5\ncompleteness: -0.2\naccuracy: 0.5")
-    assert score.relevance == 1.0   # Clamped from 1.5
+    assert score.relevance == 1.0  # Clamped from 1.5
     assert score.completeness == 0.5  # Fallback — regex doesn't match negative numbers
     assert score.accuracy == 0.5

@@ -64,12 +64,10 @@ def ingest_document(
             "ingest_document_failed",
             extra={"error": str(exc), "task_id": self.request.id},
         )
-        raise self.retry(exc=exc, countdown=2 ** self.request.retries * 10) from exc
+        raise self.retry(exc=exc, countdown=2**self.request.retries * 10) from exc
 
 
-async def _ingest_document_async(
-    content: str, metadata: dict[str, Any]
-) -> dict[str, Any]:
+async def _ingest_document_async(content: str, metadata: dict[str, Any]) -> dict[str, Any]:
     """Async implementation of document ingestion."""
     from packages.rag.embeddings import EmbeddingService
     from packages.rag.schemas import DocumentMetadata, IngestRequest
@@ -94,9 +92,7 @@ async def _ingest_document_async(
 
     async with get_session_factory()() as session:
         rag_service = RAGService(session=session, embedding_service=embedding_service)
-        response = await rag_service.ingest(
-            IngestRequest(content=content, metadata=doc_metadata)
-        )
+        response = await rag_service.ingest(IngestRequest(content=content, metadata=doc_metadata))
         await session.commit()
 
     return {

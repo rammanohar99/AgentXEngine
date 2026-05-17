@@ -51,9 +51,7 @@ def summarize_session_memory(
         raise self.retry(exc=exc) from exc
 
 
-async def _summarize_async(
-    session_id: str, turns: list[dict[str, Any]]
-) -> dict[str, Any]:
+async def _summarize_async(session_id: str, turns: list[dict[str, Any]]) -> dict[str, Any]:
     """Async implementation of memory summarization."""
     from packages.memory.schemas import ConversationTurn
     from packages.memory.summarizer import MemorySummarizer
@@ -65,8 +63,7 @@ async def _summarize_async(
     summarizer = MemorySummarizer(llm_provider=llm)
 
     conversation_turns = [
-        ConversationTurn(role=turn["role"], content=turn["content"])
-        for turn in turns
+        ConversationTurn(role=turn["role"], content=turn["content"]) for turn in turns
     ]
 
     summary = await summarizer.summarize(session_id, conversation_turns)

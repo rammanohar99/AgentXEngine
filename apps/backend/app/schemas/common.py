@@ -25,6 +25,7 @@ class HealthStatus(BaseModel):
 
 class APIResponse(BaseModel, Generic[DataT]):
     """Standard envelope for all successful API responses."""
+
     success: bool = True
     data: DataT
     correlation_id: str | None = None
@@ -32,6 +33,7 @@ class APIResponse(BaseModel, Generic[DataT]):
 
 class APIError(BaseModel):
     """Standard envelope for all error responses."""
+
     success: bool = False
     error: str
     detail: Any | None = None
@@ -40,6 +42,7 @@ class APIError(BaseModel):
 
 class PaginatedResponse(BaseModel, Generic[DataT]):
     """Paginated list response."""
+
     items: list[DataT]
     total: int
     page: int

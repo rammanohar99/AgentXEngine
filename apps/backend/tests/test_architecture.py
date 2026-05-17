@@ -28,10 +28,7 @@ def test_inv001_no_nested_retries() -> None:
 
     for file_path in WORKSPACE_ROOT.rglob("*.py"):
         # Ignore external/generated directories
-        if any(
-            part.startswith(".") or part in _IGNORED_DIRS
-            for part in file_path.parts
-        ):
+        if any(part.startswith(".") or part in _IGNORED_DIRS for part in file_path.parts):
             continue
 
         if file_path.name in allowed_files:
@@ -44,19 +41,12 @@ def test_inv001_no_nested_retries() -> None:
 
         rel = file_path.relative_to(WORKSPACE_ROOT)
         retry_policy_imports = (
-            "from app.services.resilience import RetryPolicy"
-            in content
+            "from app.services.resilience import RetryPolicy" in content
             or "from packages.agents.resilience import RetryPolicy" in content
         )
-        assert not retry_policy_imports, (
-            f"INV-001 Violation: RetryPolicy import found in {rel}"
-        )
-        tenacity_imports = (
-            "import tenacity" in content or "from tenacity" in content
-        )
-        assert not tenacity_imports, (
-            f"INV-001 Violation: tenacity import found in {rel}"
-        )
+        assert not retry_policy_imports, f"INV-001 Violation: RetryPolicy import found in {rel}"
+        tenacity_imports = "import tenacity" in content or "from tenacity" in content
+        assert not tenacity_imports, f"INV-001 Violation: tenacity import found in {rel}"
 
 
 def test_inv002_long_lived_circuit_breakers() -> None:
@@ -98,10 +88,7 @@ def test_inv005_evaluations_are_non_blocking() -> None:
     tree = ast.parse(content)
 
     for node in ast.walk(tree):
-        if (
-            isinstance(node, ast.Await)
-            and isinstance(node.value, ast.Call)
-        ):
+        if isinstance(node, ast.Await) and isinstance(node.value, ast.Call):
             func = node.value.func
             if isinstance(func, ast.Attribute) and func.attr == "evaluate_response":
                 raise AssertionError(
@@ -124,6 +111,6 @@ def test_inv008_single_authoritative_session_layer() -> None:
             continue
 
         content = file_path.read_text(encoding="utf-8")
-        assert "_sessions:" not in content and "_sessions =" not in content, (
-            f"INV-008 Violation: Local _sessions dict found in {file_path.name}"
-        )
+        assert (
+            "_sessions:" not in content and "_sessions =" not in content
+        ), f"INV-008 Violation: Local _sessions dict found in {file_path.name}"

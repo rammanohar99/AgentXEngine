@@ -100,5 +100,6 @@ def test_terminal_prompt_description() -> None:
 
 def test_registry_includes_terminal() -> None:
     from packages.agents.tool_registry import ToolRegistry
+
     registry = ToolRegistry.with_defaults()
     assert registry.get("terminal") is not None

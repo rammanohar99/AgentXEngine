@@ -117,6 +117,7 @@ def _register_retrieval_tool(
     Skipped gracefully if neither GCP project nor API key is configured.
     """
     from typing import TYPE_CHECKING
+
     if TYPE_CHECKING:
         pass
 
@@ -179,14 +180,29 @@ def _build_memory_manager() -> MemoryManager:
 class _NoOpRedis:
     """Minimal Redis stub used when Redis is unavailable."""
 
-    async def lrange(self, *args, **kwargs): return []
-    async def rpush(self, *args, **kwargs): return 0
-    async def expire(self, *args, **kwargs): return 0
-    async def llen(self, *args, **kwargs): return 0
-    async def ltrim(self, *args, **kwargs): return 0
-    async def delete(self, *args, **kwargs): return 0
-    async def get(self, *args, **kwargs): return None
-    async def set(self, *args, **kwargs): return None
+    async def lrange(self, *args, **kwargs):
+        return []
+
+    async def rpush(self, *args, **kwargs):
+        return 0
+
+    async def expire(self, *args, **kwargs):
+        return 0
+
+    async def llen(self, *args, **kwargs):
+        return 0
+
+    async def ltrim(self, *args, **kwargs):
+        return 0
+
+    async def delete(self, *args, **kwargs):
+        return 0
+
+    async def get(self, *args, **kwargs):
+        return None
+
+    async def set(self, *args, **kwargs):
+        return None
 
 
 # ── Service ───────────────────────────────────────────────────────────────────

@@ -63,6 +63,7 @@ class RAGService:
     async def delete_document(self, document_id: str) -> bool:
         """Delete a document and all its chunks. Returns True if deleted."""
         import uuid as _uuid
+
         return await self._repo.delete_document(_uuid.UUID(document_id))
 
     async def ingest(self, request: IngestRequest) -> IngestResponse:
