@@ -52,7 +52,7 @@ class WorkflowDefinition(BaseModel):
     description: str
     tasks: list[AgentTask]
     created_at: datetime.datetime = Field(
-        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
     )
 
 
@@ -67,7 +67,7 @@ class WorkflowRun(BaseModel):
     final_output: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
     created_at: datetime.datetime = Field(
-        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
     )
     completed_at: datetime.datetime | None = None
 

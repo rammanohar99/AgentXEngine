@@ -33,8 +33,9 @@ Usage:
 from __future__ import annotations
 
 import time
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Generator
+from typing import Any
 
 import structlog
 
@@ -199,7 +200,7 @@ class MetricsCollector:
         )
 
     @contextmanager
-    def timed(self, metric_name: str, **labels: Any) -> Generator[dict, None, None]:
+    def timed(self, metric_name: str, **labels: Any) -> Generator[dict[str, Any], None, None]:
         """
         Context manager that measures execution time and emits a metric.
 

@@ -35,7 +35,7 @@ from __future__ import annotations
 import asyncio
 import enum
 import time
-from collections.abc import AsyncGenerator, Callable, Coroutine
+from collections.abc import Callable, Coroutine
 from typing import Any, TypeVar
 
 import structlog
@@ -67,19 +67,16 @@ def _is_transient_error(exc: Exception) -> bool:
     Permanent: auth failures, invalid requests, quota exhaustion.
     """
     error_message = str(exc).lower()
-    for pattern in _PERMANENT_ERROR_PATTERNS:
-        if pattern in error_message:
-            return False
-    return True
+    return all(pattern not in error_message for pattern in _PERMANENT_ERROR_PATTERNS)
 
 
 # ── Circuit Breaker ───────────────────────────────────────────────────────────
 
 
 class CircuitState(str, enum.Enum):
-    CLOSED = "closed"       # Normal operation
-    OPEN = "open"           # Failing — reject requests immediately
-    HALF_OPEN = "half_open" # Testing recovery — allow one request through
+    CLOSED = "closed"  # Normal operation
+    OPEN = "open"  # Failing — reject requests immediately
+    HALF_OPEN = "half_open"  # Testing recovery — allow one request through
 
 
 class CircuitBreaker:
@@ -167,7 +164,7 @@ class CircuitBreaker:
     def is_open(self) -> bool:
         return self.state == CircuitState.OPEN
 
-    async def guard(self, operation_name: str) -> "CircuitBreakerContext":
+    async def guard(self, operation_name: str) -> CircuitBreakerContext:
         """Async context manager for circuit-protected operations."""
         return CircuitBreakerContext(self, operation_name)
 
@@ -179,7 +176,7 @@ class CircuitBreakerContext:
         self._breaker = breaker
         self._operation_name = operation_name
 
-    async def __aenter__(self) -> "CircuitBreakerContext":
+    async def __aenter__(self) -> CircuitBreakerContext:
         if self._breaker.is_open():
             raise CircuitOpenError(
                 f"Circuit breaker '{self._breaker._name}' is OPEN. "
@@ -197,6 +194,7 @@ class CircuitBreakerContext:
 
 class CircuitOpenError(Exception):
     """Raised when a circuit breaker is open and rejects a request."""
+
     pass
 
 
@@ -297,7 +295,8 @@ class RetryPolicy:
                 delay = min(self._base_delay * (2 ** (attempt - 1)), self._max_delay)
                 if self._jitter:
                     import random
-                    delay *= (0.5 + random.random() * 0.5)
+
+                    delay *= 0.5 + random.random() * 0.5
 
                 logger.info(
                     "retry_backoff",
@@ -337,16 +336,16 @@ async def with_timeout(
     """
     try:
         return await asyncio.wait_for(coro, timeout=timeout_seconds)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         logger.error(
             "operation_timeout",
             operation=operation_name,
             timeout_seconds=timeout_seconds,
             correlation_id=correlation_id,
         )
-        raise asyncio.TimeoutError(
+        raise TimeoutError(
             f"Operation '{operation_name}' timed out after {timeout_seconds}s"
-        )
+        ) from None
 
 
 # ── Module-level circuit breakers (one per external service) ─────────────────

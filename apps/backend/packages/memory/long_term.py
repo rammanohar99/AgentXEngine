@@ -23,6 +23,8 @@ Usage:
 
 from __future__ import annotations
 
+from typing import Any, cast
+
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -41,7 +43,7 @@ class LongTermMemory:
     Degrades gracefully if Redis is unavailable.
     """
 
-    def __init__(self, redis_client: object) -> None:
+    def __init__(self, redis_client: Any) -> None:
         self._redis = redis_client
 
     def _key(self, session_id: str) -> str:
@@ -93,6 +95,6 @@ class LongTermMemory:
     async def fact_count(self, session_id: str) -> int:
         """Return the number of stored facts."""
         try:
-            return await self._redis.llen(self._key(session_id))
+            return cast(int, await self._redis.llen(self._key(session_id)))
         except Exception:
             return 0

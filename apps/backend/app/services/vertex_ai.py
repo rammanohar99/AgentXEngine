@@ -99,6 +99,7 @@ class VertexAIService:
         max_output_tokens: int = 8192,
         response_schema: Any | None = None,
         correlation_id: str = "",
+        **kwargs: Any,
     ) -> Any:
         """
         Non-streaming completion. Returns a response object with a .text attribute.

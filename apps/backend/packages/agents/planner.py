@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 import uuid
+from typing import Any
 
 from packages.agents.schemas import AgentDecision, DecisionType, ToolCall
 from packages.agents.tool_registry import ToolRegistry
@@ -26,6 +27,7 @@ from packages.agents.tool_registry import ToolRegistry
 
 class PlannerError(Exception):
     """Raised when the planner cannot parse the LLM output."""
+
     pass
 
 
@@ -128,7 +130,7 @@ class Planner:
 
         return text[content_start:end_idx].strip()
 
-    def _parse_action_input(self, raw_input: str) -> dict:
+    def _parse_action_input(self, raw_input: str) -> dict[str, Any]:
         """
         Parse the Action Input section as JSON.
 
@@ -160,6 +162,7 @@ class Planner:
         # The LLM sometimes outputs {'key': 'value'} instead of {"key": "value"}
         try:
             import ast
+
             parsed = ast.literal_eval(cleaned)
             if isinstance(parsed, dict):
                 return parsed

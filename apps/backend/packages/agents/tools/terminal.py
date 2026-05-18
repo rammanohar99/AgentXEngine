@@ -37,15 +37,17 @@ logger = structlog.get_logger(__name__)
 
 # Commands that are explicitly permitted
 # Format: tuple of allowed command prefixes (first token must match)
-_ALLOWED_COMMANDS: frozenset[str] = frozenset([
-    "git",
-    "echo",
-    "python",
-    "pytest",
-    "ruff",
-    "black",
-    "mypy",
-])
+_ALLOWED_COMMANDS: frozenset[str] = frozenset(
+    [
+        "git",
+        "echo",
+        "python",
+        "pytest",
+        "ruff",
+        "black",
+        "mypy",
+    ]
+)
 
 _MAX_OUTPUT_CHARS = 4000
 _DEFAULT_TIMEOUT_SECONDS = 30
@@ -148,20 +150,22 @@ class TerminalTool(BaseTool):
             )
 
             try:
-                stdout, _ = await asyncio.wait_for(
-                    process.communicate(), timeout=timeout
-                )
-            except asyncio.TimeoutError:
+                stdout, _ = await asyncio.wait_for(process.communicate(), timeout=timeout)
+            except TimeoutError:
                 process.kill()
                 await process.communicate()
-                raise TimeoutError(f"Command timed out after {timeout} seconds: {command}")
+                raise TimeoutError(
+                    f"Command timed out after {timeout} seconds: {command}"
+                ) from None
 
             output = stdout.decode("utf-8", errors="replace")
             exit_code = process.returncode or 0
 
             # Truncate large outputs
             if len(output) > _MAX_OUTPUT_CHARS:
-                output = output[:_MAX_OUTPUT_CHARS] + f"\n... (truncated at {_MAX_OUTPUT_CHARS} chars)"
+                output = (
+                    output[:_MAX_OUTPUT_CHARS] + f"\n... (truncated at {_MAX_OUTPUT_CHARS} chars)"
+                )
 
             result = f"$ {command}\n(exit code: {exit_code})\n\n{output}"
 

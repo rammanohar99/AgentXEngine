@@ -25,6 +25,9 @@ Usage:
 
 from __future__ import annotations
 
+import contextlib
+from typing import Any
+
 import structlog
 
 from packages.memory.long_term import LongTermMemory
@@ -58,7 +61,7 @@ class MemoryManager:
         short_term: ShortTermMemory,
         long_term: LongTermMemory,
         summarizer: MemorySummarizer,
-        redis_client: object | None = None,
+        redis_client: Any | None = None,
     ) -> None:
         self._short_term = short_term
         self._long_term = long_term
@@ -143,6 +146,7 @@ class MemoryManager:
         if existing_summary:
             # Prepend existing summary as context for the new summarization
             from packages.memory.schemas import ConversationTurn
+
             summary_turn = ConversationTurn(
                 role="assistant",
                 content=f"[Previous summary: {existing_summary}]",
@@ -191,7 +195,5 @@ class MemoryManager:
         """Delete the summary for a session."""
         self._summary_cache.pop(session_id, None)
         if self._redis is not None:
-            try:
+            with contextlib.suppress(Exception):
                 await self._redis.delete(f"{_SUMMARY_KEY_PREFIX}{session_id}")
-            except Exception:
-                pass

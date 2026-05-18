@@ -67,7 +67,7 @@ class ToolRegistry:
         return "\n\n".join(tool.to_prompt_description() for tool in self._tools.values())
 
     @classmethod
-    def with_defaults(cls) -> "ToolRegistry":
+    def with_defaults(cls) -> ToolRegistry:
         """
         Create a registry pre-loaded with the full default tool set.
 
@@ -89,7 +89,7 @@ class ToolRegistry:
         return registry
 
     @classmethod
-    def with_database(cls, database_url: str) -> "ToolRegistry":
+    def with_database(cls, database_url: str) -> ToolRegistry:
         """
         Create a registry that includes the database query tool.
 

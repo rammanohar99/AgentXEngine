@@ -22,7 +22,6 @@ from typing import Any
 
 from packages.agents.tools.base import BaseTool
 
-
 # Type alias for the retriever callable
 # Takes (query: str, top_k: int) → list of result dicts
 RetrieverFn = Callable[[str, int], Awaitable[list[dict[str, Any]]]]
@@ -73,6 +72,7 @@ class RetrieveDocumentsTool(BaseTool):
         # inside an "input" key: {"input": "{'query': '...', 'top_k': 5}"}
         if "input" in arguments and "query" not in arguments:
             import json
+
             raw = arguments["input"]
             try:
                 # Try JSON parse first, then Python literal eval as fallback
@@ -80,9 +80,10 @@ class RetrieveDocumentsTool(BaseTool):
             except (json.JSONDecodeError, TypeError):
                 try:
                     import ast
+
                     arguments = ast.literal_eval(str(raw))
                 except Exception:
-                    return f"Invalid tool arguments. Expected {{\"query\": \"...\"}}, got: {raw}"
+                    return f'Invalid tool arguments. Expected {{"query": "..."}}, got: {raw}'
 
         query: str = arguments["query"]
         top_k: int = int(arguments.get("top_k", 5))

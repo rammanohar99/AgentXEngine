@@ -55,7 +55,7 @@ def _safe_resolve(raw_path: str) -> pathlib.Path:
         raise ValueError(
             f"Path '{raw_path}' resolves outside the workspace root '{workspace_root}'. "
             "Access denied."
-        )
+        ) from None
 
     return resolved
 
@@ -102,7 +102,9 @@ class ReadFileTool(BaseTool):
                 },
                 "end_line": {
                     "type": "integer",
-                    "description": "Last line to read (1-indexed, inclusive). Defaults to end of file.",
+                    "description": (
+                        "Last line to read (1-indexed, inclusive). Defaults to end of file."
+                    ),
                 },
             },
             "required": ["path"],
@@ -124,7 +126,9 @@ class ReadFileTool(BaseTool):
                 f"File '{raw_path}' exceeds the {MAX_FILE_SIZE_BYTES // 1024}KB size limit."
             )
         if _is_binary(resolved):
-            raise ValueError(f"File '{raw_path}' appears to be binary. Only text files are supported.")
+            raise ValueError(
+                f"File '{raw_path}' appears to be binary. Only text files are supported."
+            )
 
         content = resolved.read_text(encoding="utf-8", errors="replace")
         lines = content.splitlines(keepends=True)
@@ -135,7 +139,10 @@ class ReadFileTool(BaseTool):
         selected_lines = lines[start_idx:end_idx]
 
         result = "".join(selected_lines)
-        line_info = f"lines {start_line}-{end_line or len(lines)}" if (start_line > 1 or end_line) else f"{len(lines)} lines"
+        if start_line > 1 or end_line:
+            line_info = f"lines {start_line}-{end_line or len(lines)}"
+        else:
+            line_info = f"{len(lines)} lines"
         return f"# {raw_path} ({line_info})\n\n{result}"
 
 
@@ -251,11 +258,15 @@ class SearchFilesTool(BaseTool):
                 },
                 "directory": {
                     "type": "string",
-                    "description": "Directory to search in, relative to workspace root. Default is '.'.",
+                    "description": (
+                        "Directory to search in, relative to workspace root. Default is '.'."
+                    ),
                 },
                 "file_pattern": {
                     "type": "string",
-                    "description": "Glob pattern to filter files (e.g. '*.py', '*.ts'). Default is '*'.",
+                    "description": (
+                        "Glob pattern to filter files (e.g. '*.py', '*.ts'). Default is '*'."
+                    ),
                 },
             },
             "required": ["pattern"],

@@ -61,7 +61,10 @@ class GitHubSearchTool(BaseTool):
                 },
                 "search_type": {
                     "type": "string",
-                    "description": "What to search: 'repositories', 'code', or 'issues'. Default is 'repositories'.",
+                    "description": (
+                        "What to search: 'repositories', 'code', or 'issues'. "
+                        "Default is 'repositories'."
+                    ),
                 },
                 "max_results": {
                     "type": "integer",
@@ -95,7 +98,7 @@ class GitHubSearchTool(BaseTool):
             import httpx
 
             url = f"{_GITHUB_API}/search/{search_type}"
-            params = {"q": query, "per_page": max_results, "sort": "stars"}
+            params: dict[str, Any] = {"q": query, "per_page": max_results, "sort": "stars"}
 
             async with httpx.AsyncClient(timeout=10.0) as client:
                 response = await client.get(url, params=params, headers=self._get_headers())
@@ -109,26 +112,29 @@ class GitHubSearchTool(BaseTool):
             return self._format_results(search_type, query, items[:max_results])
 
         except ImportError:
-            raise RuntimeError("httpx is required for GitHub search.")
+            raise RuntimeError("httpx is required for GitHub search.") from None
 
-    def _format_results(
-        self, search_type: str, query: str, items: list[dict[str, Any]]
-    ) -> str:
+    def _format_results(self, search_type: str, query: str, items: list[dict[str, Any]]) -> str:
         lines = [f"# GitHub {search_type} results for: '{query}'\n"]
 
         for index, item in enumerate(items, start=1):
             if search_type == "repositories":
                 lines.append(f"## {index}. {item.get('full_name', 'Unknown')}")
                 lines.append(item.get("description") or "No description")
-                lines.append(f"Stars: {item.get('stargazers_count', 0)} | Language: {item.get('language', 'Unknown')}")
+                stars = item.get("stargazers_count", 0)
+                lang = item.get("language", "Unknown")
+                lines.append(f"Stars: {stars} | Language: {lang}")
                 lines.append(f"URL: {item.get('html_url', '')}")
             elif search_type == "code":
-                lines.append(f"## {index}. {item.get('name', 'Unknown')} in {item.get('repository', {}).get('full_name', '')}")
+                repo_name = item.get("repository", {}).get("full_name", "")
+                lines.append(f"## {index}. {item.get('name', 'Unknown')} in {repo_name}")
                 lines.append(f"Path: {item.get('path', '')}")
                 lines.append(f"URL: {item.get('html_url', '')}")
             elif search_type == "issues":
                 lines.append(f"## {index}. {item.get('title', 'Unknown')}")
-                lines.append(f"State: {item.get('state', '')} | Comments: {item.get('comments', 0)}")
+                state = item.get("state", "")
+                comments = item.get("comments", 0)
+                lines.append(f"State: {state} | Comments: {comments}")
                 lines.append(f"URL: {item.get('html_url', '')}")
             lines.append("")
 

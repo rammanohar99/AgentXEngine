@@ -21,8 +21,7 @@ Usage:
 
 from __future__ import annotations
 
-import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import structlog
 
@@ -65,9 +64,7 @@ class WorkflowExecutor:
 
                 for task in list(remaining):
                     # Check if all dependencies are complete
-                    deps_met = all(
-                        dep_id in completed_results for dep_id in task.depends_on
-                    )
+                    deps_met = all(dep_id in completed_results for dep_id in task.depends_on)
                     if not deps_met:
                         continue
 
@@ -95,7 +92,7 @@ class WorkflowExecutor:
             # Check if all tasks completed successfully
             failed_tasks = [t for t in run.tasks if t.status == TaskStatus.FAILED]
             run.status = WorkflowStatus.FAILED if failed_tasks else WorkflowStatus.COMPLETE
-            run.completed_at = datetime.now(timezone.utc)
+            run.completed_at = datetime.now(UTC)
 
             logger.info(
                 "workflow_run_complete",
@@ -106,14 +103,12 @@ class WorkflowExecutor:
 
         except Exception as exc:
             run.status = WorkflowStatus.FAILED
-            run.completed_at = datetime.now(timezone.utc)
+            run.completed_at = datetime.now(UTC)
             logger.error("workflow_run_failed", run_id=run.run_id, error=str(exc))
 
         return run
 
-    async def _run_task(
-        self, task: AgentTask, instruction: str, session_id: str
-    ) -> str:
+    async def _run_task(self, task: AgentTask, instruction: str, session_id: str) -> str:
         """
         Execute a single task using the appropriate specialist agent.
 
@@ -126,7 +121,7 @@ class WorkflowExecutor:
         from packages.agents.schemas import AgentEventType
 
         task.status = TaskStatus.RUNNING
-        task.started_at = datetime.now(timezone.utc)
+        task.started_at = datetime.now(UTC)
 
         logger.info(
             "workflow_task_start",
@@ -159,7 +154,7 @@ class WorkflowExecutor:
             if error_content is not None:
                 task.status = TaskStatus.FAILED
                 task.error = error_content
-                task.completed_at = datetime.now(timezone.utc)
+                task.completed_at = datetime.now(UTC)
                 logger.error(
                     "workflow_task_failed_via_error_event",
                     task_id=task.task_id,
@@ -169,7 +164,7 @@ class WorkflowExecutor:
 
             task.result = result
             task.status = TaskStatus.COMPLETE
-            task.completed_at = datetime.now(timezone.utc)
+            task.completed_at = datetime.now(UTC)
 
             logger.info(
                 "workflow_task_complete",
@@ -181,13 +176,11 @@ class WorkflowExecutor:
         except Exception as exc:
             task.status = TaskStatus.FAILED
             task.error = str(exc)
-            task.completed_at = datetime.now(timezone.utc)
+            task.completed_at = datetime.now(UTC)
             logger.error("workflow_task_failed", task_id=task.task_id, error=str(exc))
             return f"Task failed: {exc}"
 
-    def _build_task_instruction(
-        self, task: AgentTask, completed_results: dict[str, str]
-    ) -> str:
+    def _build_task_instruction(self, task: AgentTask, completed_results: dict[str, str]) -> str:
         """Build the full instruction for a task, including dependency results."""
         if not task.depends_on:
             return task.instruction

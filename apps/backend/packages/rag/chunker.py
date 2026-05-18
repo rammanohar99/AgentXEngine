@@ -23,7 +23,7 @@ from __future__ import annotations
 import re
 import uuid
 
-from packages.rag.schemas import Chunk, Document, DocumentMetadata
+from packages.rag.schemas import Chunk, Document
 
 
 class Chunker:

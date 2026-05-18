@@ -16,10 +16,10 @@ from pydantic import BaseModel, Field
 class DocumentMetadata(BaseModel):
     """Metadata attached to an ingested document."""
 
-    source: str = ""          # File path, URL, or identifier
-    source_type: str = ""     # "file" | "markdown" | "pdf" | "repository"
+    source: str = ""  # File path, URL, or identifier
+    source_type: str = ""  # "file" | "markdown" | "pdf" | "repository"
     title: str = ""
-    language: str = ""        # Programming language or "markdown", "text"
+    language: str = ""  # Programming language or "markdown", "text"
     extra: dict[str, Any] = Field(default_factory=dict)
 
 
@@ -30,7 +30,7 @@ class Document(BaseModel):
     content: str
     metadata: DocumentMetadata = Field(default_factory=DocumentMetadata)
     created_at: datetime.datetime = Field(
-        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
     )
 
 
@@ -51,7 +51,7 @@ class RetrievalResult(BaseModel):
     chunk_id: str
     document_id: str
     text: str
-    score: float          # Cosine similarity score (0–1, higher = more similar)
+    score: float  # Cosine similarity score (0–1, higher = more similar)
     metadata: DocumentMetadata = Field(default_factory=DocumentMetadata)
 
     def to_context_string(self) -> str:

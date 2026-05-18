@@ -31,7 +31,8 @@ from packages.rag.schemas import RetrievalResult
 logger = structlog.get_logger(__name__)
 
 _RERANK_PROMPT = """\
-You are a relevance scoring system. Score how relevant the following document excerpt is to the query.
+You are a relevance scoring system. \
+Score how relevant the following document excerpt is to the query.
 
 Query: {query}
 
@@ -48,8 +49,9 @@ Score:"""
 
 @runtime_checkable
 class RerankerLLM(Protocol):
-    async def complete(self, messages: list[Any], temperature: float = 0.0, **kwargs: Any) -> Any:
-        ...
+    async def complete(
+        self, messages: list[Any], temperature: float = 0.0, **kwargs: Any
+    ) -> Any: ...
 
 
 class Reranker:
@@ -98,7 +100,7 @@ class Reranker:
                         self._score_chunk(query, text),
                         timeout=self._timeout_seconds,
                     )
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     logger.warning("rerank_score_timeout", timeout=self._timeout_seconds)
                     return 0.5
                 except Exception as exc:
@@ -106,12 +108,10 @@ class Reranker:
                     return 0.5
 
         # Score each result concurrently (ADR-004) with bounded concurrency
-        scores = await asyncio.gather(*[
-            _bounded_score(result.text) for result in results
-        ])
-        
+        scores = await asyncio.gather(*[_bounded_score(result.text) for result in results])
+
         # Combine results with scores
-        scored = list(zip(results, scores))
+        scored = list(zip(results, scores, strict=False))
 
         # Sort by reranked score descending
         scored.sort(key=lambda pair: pair[1], reverse=True)
@@ -123,7 +123,7 @@ class Reranker:
             reranked.append(updated)
 
         latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
-        
+
         logger.info(
             "metric.rag_reranker",
             query_length=len(query),
@@ -146,6 +146,7 @@ class Reranker:
 
             # Parse the score — extract first float found
             import re
+
             match = re.search(r"\d+\.?\d*", raw)
             if match:
                 score = float(match.group())

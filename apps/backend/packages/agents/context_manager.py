@@ -33,6 +33,8 @@ Usage:
 
 from __future__ import annotations
 
+from typing import Any
+
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -70,7 +72,7 @@ class ContextManager:
         self._max_tool_output_chars = max_tool_output_chars
         self._max_history_messages = max_history_messages
 
-    def estimate_tokens(self, messages: list) -> int:
+    def estimate_tokens(self, messages: list[Any]) -> int:
         """Estimate total token count for a message list."""
         return sum(_estimate_message_tokens(msg) for msg in messages)
 
@@ -84,7 +86,10 @@ class ContextManager:
             return output
 
         truncated = output[: self._max_tool_output_chars]
-        notice = f"\n\n[Output truncated at {self._max_tool_output_chars} chars. Full output available via tool call.]"
+        notice = (
+            f"\n\n[Output truncated at {self._max_tool_output_chars} chars. "
+            "Full output available via tool call.]"
+        )
 
         logger.info(
             "tool_output_truncated",
@@ -95,7 +100,7 @@ class ContextManager:
 
         return truncated + notice
 
-    def prepare_messages(self, messages: list, correlation_id: str = "") -> list:
+    def prepare_messages(self, messages: list[Any], correlation_id: str = "") -> list[Any]:
         """
         Prepare a message list for an LLM call.
 
@@ -112,7 +117,7 @@ class ContextManager:
         # Apply history window cap
         if len(conversation) > self._max_history_messages:
             dropped = len(conversation) - self._max_history_messages
-            conversation = conversation[-self._max_history_messages:]
+            conversation = conversation[-self._max_history_messages :]
             logger.info(
                 "context_history_truncated",
                 dropped_messages=dropped,
@@ -124,9 +129,7 @@ class ContextManager:
         estimated_tokens = self.estimate_tokens(prepared)
 
         if estimated_tokens > self._max_tokens:
-            prepared = self._truncate_to_budget(
-                system_messages, conversation, correlation_id
-            )
+            prepared = self._truncate_to_budget(system_messages, conversation, correlation_id)
             final_tokens = self.estimate_tokens(prepared)
             logger.warning(
                 "context_budget_exceeded",
@@ -147,10 +150,10 @@ class ContextManager:
 
     def _truncate_to_budget(
         self,
-        system_messages: list,
-        conversation: list,
+        system_messages: list[Any],
+        conversation: list[Any],
         correlation_id: str,
-    ) -> list:
+    ) -> list[Any]:
         """
         Truncate conversation to fit within token budget.
 
@@ -173,7 +176,7 @@ class ContextManager:
 
         return system_messages + older + recent
 
-    def get_budget_status(self, messages: list) -> dict:
+    def get_budget_status(self, messages: list[Any]) -> dict[str, Any]:
         """Return a dict describing current context budget usage."""
         estimated = self.estimate_tokens(messages)
         return {

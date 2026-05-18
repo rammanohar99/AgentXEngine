@@ -23,6 +23,7 @@ logger = structlog.get_logger(__name__)
 
 class ExecutorError(Exception):
     """Raised when the executor cannot find the requested tool."""
+
     pass
 
 

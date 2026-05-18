@@ -22,8 +22,6 @@ import time
 import uuid
 from typing import Any
 
-from pydantic import BaseModel
-
 from packages.agents.schemas import ToolCall, ToolResult
 
 

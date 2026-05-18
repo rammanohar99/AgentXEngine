@@ -19,19 +19,18 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-
 # ── Event types ───────────────────────────────────────────────────────────────
 
 
 class AgentEventType(str, Enum):
     """All possible event types emitted by the runtime during a run."""
 
-    REASONING = "reasoning"      # Intermediate thought text from the LLM
-    TOOL_CALL = "tool_call"      # Agent decided to call a tool
+    REASONING = "reasoning"  # Intermediate thought text from the LLM
+    TOOL_CALL = "tool_call"  # Agent decided to call a tool
     TOOL_RESULT = "tool_result"  # Tool execution completed
-    TEXT = "text"                # Final answer text chunk (streaming)
-    DONE = "done"                # Run complete
-    ERROR = "error"              # Unrecoverable error
+    TEXT = "text"  # Final answer text chunk (streaming)
+    DONE = "done"  # Run complete
+    ERROR = "error"  # Unrecoverable error
 
 
 class AgentEvent(BaseModel):
@@ -45,7 +44,9 @@ class AgentEvent(BaseModel):
     type: AgentEventType
     content: str | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
-    timestamp: datetime.datetime = Field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc))
+    timestamp: datetime.datetime = Field(
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
+    )
 
 
 # ── Tool schemas ──────────────────────────────────────────────────────────────
@@ -97,7 +98,7 @@ class AgentDecision(BaseModel):
     """
 
     decision_type: DecisionType
-    reasoning: str = ""          # The "Thought:" section from ReAct output
+    reasoning: str = ""  # The "Thought:" section from ReAct output
     tool_call: ToolCall | None = None
     final_answer: str | None = None
 

@@ -122,7 +122,10 @@ class Orchestrator:
         logger.info("delegation_start", role=role_name, task_length=len(task))
 
         specialist = self._get_specialist_runtime(role_name)
-        config = get_agent_config(AgentRole(role_name) if role_name in AgentRole._value2member_map_ else AgentRole.CODING)
+        role = (
+            AgentRole(role_name) if role_name in AgentRole._value2member_map_ else AgentRole.CODING
+        )
+        config = get_agent_config(role)
 
         # Build specialist history with its specialized system prompt
         history = [Message(role="system", content=config.system_prompt)]

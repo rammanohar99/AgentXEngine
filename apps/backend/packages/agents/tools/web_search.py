@@ -15,7 +15,6 @@ AGENTS.md: "web search tool" listed as an initial tool.
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import structlog
@@ -102,7 +101,7 @@ class WebSearchTool(BaseTool):
         except ImportError:
             raise RuntimeError(
                 "httpx is required for web search. Install it with: pip install httpx"
-            )
+            ) from None
 
     def _parse_ddg_response(self, data: dict[str, Any], max_results: int) -> list[dict[str, Any]]:
         """Extract results from DuckDuckGo API response."""
@@ -110,19 +109,23 @@ class WebSearchTool(BaseTool):
 
         # Abstract (direct answer)
         if data.get("Abstract"):
-            results.append({
-                "title": data.get("Heading", "Answer"),
-                "snippet": data["Abstract"],
-                "url": data.get("AbstractURL", ""),
-            })
+            results.append(
+                {
+                    "title": data.get("Heading", "Answer"),
+                    "snippet": data["Abstract"],
+                    "url": data.get("AbstractURL", ""),
+                }
+            )
 
         # Related topics
         for topic in data.get("RelatedTopics", [])[:max_results]:
             if isinstance(topic, dict) and topic.get("Text"):
-                results.append({
-                    "title": topic.get("Text", "")[:80],
-                    "snippet": topic.get("Text", ""),
-                    "url": topic.get("FirstURL", ""),
-                })
+                results.append(
+                    {
+                        "title": topic.get("Text", "")[:80],
+                        "snippet": topic.get("Text", ""),
+                        "url": topic.get("FirstURL", ""),
+                    }
+                )
 
         return results[:max_results]

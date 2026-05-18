@@ -50,7 +50,7 @@ logger = get_logger(__name__)
 
 _runtime: AgentRuntime | None = None
 _memory_manager: MemoryManager | None = None
-_tracer: AgentTracer | None = None
+_tracer: Any = None
 _evaluator: AgentEvaluator | None = None
 
 
@@ -68,7 +68,7 @@ def _get_memory_manager() -> MemoryManager:
     return _memory_manager
 
 
-def _get_tracer() -> AgentTracer:
+def _get_tracer() -> Any:
     global _tracer
     if _tracer is None:
         _tracer = AgentTracer.from_settings(get_settings())

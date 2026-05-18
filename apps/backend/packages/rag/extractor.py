@@ -21,10 +21,10 @@ from __future__ import annotations
 
 import csv
 import io
-import logging
+import structlog
 from typing import Any
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 # File extension → source_type label used in DocumentMetadata
 EXTENSION_TO_SOURCE_TYPE: dict[str, str] = {
@@ -126,7 +126,7 @@ async def extract_image_text(
                     types.Part(
                         inline_data=types.Blob(
                             mime_type=mime_type,
-                            data=base64.b64encode(content_bytes).decode(),
+                            data=content_bytes,
                         )
                     ),
                     types.Part(text=prompt),
@@ -261,8 +261,10 @@ def _extract_csv(content_bytes: bytes, filename: str) -> str:
 
     lines: list[str] = [f"## {filename}"]
     for row_idx, row in enumerate(rows):
-        padded = [row[i].ljust(col_widths[i]) if i < len(row) else " " * col_widths[i]
-                  for i in range(col_count)]
+        padded = [
+            row[i].ljust(col_widths[i]) if i < len(row) else " " * col_widths[i]
+            for i in range(col_count)
+        ]
         lines.append(" | ".join(padded).rstrip())
         if row_idx == 0:
             lines.append("-" * (sum(col_widths) + col_count * 3))

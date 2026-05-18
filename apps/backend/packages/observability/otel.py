@@ -39,10 +39,12 @@ def configure_otel(service_name: str = "aiengos-backend", environment: str = "de
         from opentelemetry.sdk.trace import TracerProvider
         from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
 
-        resource = Resource.create({
-            "service.name": service_name,
-            "deployment.environment": environment,
-        })
+        resource = Resource.create(
+            {
+                "service.name": service_name,
+                "deployment.environment": environment,
+            }
+        )
 
         provider = TracerProvider(resource=resource)
 
@@ -51,6 +53,7 @@ def configure_otel(service_name: str = "aiengos-backend", environment: str = "de
             # Configure OTEL_EXPORTER_OTLP_ENDPOINT env var to point to your collector
             try:
                 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+
                 exporter = OTLPSpanExporter()
                 provider.add_span_processor(BatchSpanProcessor(exporter))
             except ImportError:
@@ -84,7 +87,8 @@ def instrument_fastapi(app: object) -> None:
     """
     try:
         from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-        FastAPIInstrumentor.instrument_app(app)  # type: ignore[arg-type]
+
+        FastAPIInstrumentor.instrument_app(app)
         logger.info("otel_fastapi_instrumented")
     except ImportError:
         logger.warning("otel_fastapi_instrumentor_not_available")

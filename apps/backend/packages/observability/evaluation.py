@@ -26,7 +26,6 @@ Usage:
 
 from __future__ import annotations
 
-import time
 from typing import Any, Protocol, runtime_checkable
 
 import structlog
@@ -91,8 +90,9 @@ class RAGRetrievalMetrics(BaseModel):
 
 @runtime_checkable
 class EvaluatorLLM(Protocol):
-    async def complete(self, messages: list[Any], temperature: float = 0.0, **kwargs: Any) -> Any:
-        ...
+    async def complete(
+        self, messages: list[Any], temperature: float = 0.0, **kwargs: Any
+    ) -> Any: ...
 
 
 class AgentEvaluator:

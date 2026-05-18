@@ -57,7 +57,7 @@ def _cosine_similarity(vec_a: list[float], vec_b: list[float]) -> float:
     """Compute cosine similarity between two vectors."""
     if not vec_a or not vec_b or len(vec_a) != len(vec_b):
         return 0.0
-    dot = sum(a * b for a, b in zip(vec_a, vec_b))
+    dot = sum(a * b for a, b in zip(vec_a, vec_b, strict=False))
     norm_a = math.sqrt(sum(a * a for a in vec_a))
     norm_b = math.sqrt(sum(b * b for b in vec_b))
     if norm_a == 0 or norm_b == 0:
@@ -103,7 +103,7 @@ class VectorMemory:
 
             # Prune oldest entries if over limit
             if len(self._store[session_id]) > self._max_entries:
-                self._store[session_id] = self._store[session_id][-self._max_entries:]
+                self._store[session_id] = self._store[session_id][-self._max_entries :]
 
         except Exception as exc:
             logger.warning("vector_memory_store_failed", session_id=session_id, error=str(exc))
@@ -138,9 +138,7 @@ class VectorMemory:
         ]
 
         # Filter by threshold and sort by score
-        relevant = [
-            (entry, score) for entry, score in scored if score >= score_threshold
-        ]
+        relevant = [(entry, score) for entry, score in scored if score >= score_threshold]
         relevant.sort(key=lambda pair: pair[1], reverse=True)
 
         return [

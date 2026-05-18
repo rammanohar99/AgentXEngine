@@ -33,7 +33,6 @@ Execution flow:
 
 from __future__ import annotations
 
-import asyncio
 import time
 import uuid
 from collections.abc import AsyncGenerator
@@ -206,7 +205,7 @@ class AgentRuntime:
                 content="The AI service is temporarily unavailable. Please try again in a moment.",
                 metadata={"run_id": run_id, "error_type": "circuit_open"},
             )
-        except asyncio.TimeoutError as exc:
+        except TimeoutError as exc:
             run_success = False
             run_error_type = "timeout"
             logger.error("agent_run_timeout", run_id=run_id, error=str(exc))
@@ -218,7 +217,12 @@ class AgentRuntime:
         except Exception as exc:
             run_success = False
             run_error_type = type(exc).__name__
-            logger.error("agent_run_error", run_id=run_id, error=str(exc), error_type=run_error_type)
+            logger.error(
+                "agent_run_error",
+                run_id=run_id,
+                error=str(exc),
+                error_type=run_error_type,
+            )
             yield AgentEvent(
                 type=AgentEventType.ERROR,
                 content=f"An unexpected error occurred: {exc}",
@@ -285,9 +289,7 @@ class AgentRuntime:
                 async for event in self._handle_final_answer(state, decision):
                     yield event
 
-    async def _call_llm_with_resilience(
-        self, messages: list[Message], run_id: str
-    ) -> str:
+    async def _call_llm_with_resilience(self, messages: list[Message], run_id: str) -> str:
         """
         Call the LLM with timeout and circuit breaker protection.
 
@@ -311,9 +313,7 @@ class AgentRuntime:
                 breaker_name=self._circuit_breaker._name,
                 event="rejected",
             )
-            raise CircuitOpenError(
-                f"Circuit breaker '{self._circuit_breaker._name}' is OPEN."
-            )
+            raise CircuitOpenError(f"Circuit breaker '{self._circuit_breaker._name}' is OPEN.")
 
         call_start = time.perf_counter()
 
@@ -386,8 +386,9 @@ class AgentRuntime:
                 operation_name=f"tool_{tool_call.tool_name}",
                 correlation_id=state.run_id,
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             from packages.agents.schemas import ToolResult
+
             result = ToolResult(
                 tool_name=tool_call.tool_name,
                 call_id=tool_call.call_id,
@@ -398,11 +399,12 @@ class AgentRuntime:
             )
 
         tool_latency_ms = round((time.perf_counter() - tool_start) * 1000, 2)
+        is_timeout = not result.success and "timed out" in (result.error or "")
         self._metrics.record_tool_execution(
             tool_name=tool_call.tool_name,
             latency_ms=tool_latency_ms,
             success=result.success,
-            error_type="timeout" if not result.success and "timed out" in (result.error or "") else None,
+            error_type="timeout" if is_timeout else None,
             output_chars=len(str(result.output or "")),
             correlation_id=state.run_id,
         )

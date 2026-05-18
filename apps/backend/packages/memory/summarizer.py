@@ -44,8 +44,9 @@ Summary:"""
 class SummarizerLLM(Protocol):
     """Minimal LLM interface needed for summarization."""
 
-    async def complete(self, messages: list[Any], temperature: float = 0.1, **kwargs: Any) -> Any:
-        ...
+    async def complete(
+        self, messages: list[Any], temperature: float = 0.1, **kwargs: Any
+    ) -> Any: ...
 
 
 class MemorySummarizer:
@@ -89,7 +90,9 @@ class MemorySummarizer:
         except Exception as exc:
             logger.warning("memory_summarize_failed", session_id=session_id, error=str(exc))
             # Fallback: return a truncated version of the conversation
-            return conversation_text[:500] + "..." if len(conversation_text) > 500 else conversation_text
+            if len(conversation_text) > 500:
+                return conversation_text[:500] + "..."
+            return conversation_text
 
     def _format_turns(self, turns: list[ConversationTurn]) -> str:
         """Format turns as a readable conversation string."""

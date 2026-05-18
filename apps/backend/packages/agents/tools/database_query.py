@@ -23,10 +23,22 @@ from packages.agents.tools.base import BaseTool
 logger = structlog.get_logger(__name__)
 
 _MAX_ROWS = 50
-_BLOCKED_KEYWORDS = frozenset([
-    "insert", "update", "delete", "drop", "truncate", "alter",
-    "create", "grant", "revoke", "exec", "execute", "call",
-])
+_BLOCKED_KEYWORDS = frozenset(
+    [
+        "insert",
+        "update",
+        "delete",
+        "drop",
+        "truncate",
+        "alter",
+        "create",
+        "grant",
+        "revoke",
+        "exec",
+        "execute",
+        "call",
+    ]
+)
 
 
 def _is_safe_query(sql: str) -> tuple[bool, str]:

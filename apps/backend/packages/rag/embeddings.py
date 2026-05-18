@@ -31,9 +31,9 @@ EMBEDDING_DIMENSIONS = 768
 
 # Hard limits from the Vertex AI / Gemini embedding API
 _MAX_TEXTS_PER_BATCH = 250
-_MAX_TOKENS_PER_BATCH = 18_000   # Stay under 20k with a safety margin
+_MAX_TOKENS_PER_BATCH = 18_000  # Stay under 20k with a safety margin
 _MAX_TOKENS_PER_TEXT = 2_048
-_CHARS_PER_TOKEN = 4              # Conservative estimate: 4 chars ≈ 1 token
+_CHARS_PER_TOKEN = 4  # Conservative estimate: 4 chars ≈ 1 token
 
 
 def _estimate_tokens(text: str) -> int:
@@ -67,7 +67,11 @@ def _build_token_aware_batches(texts: list[str]) -> list[list[str]]:
         max_chars = _MAX_TOKENS_PER_TEXT * _CHARS_PER_TOKEN
         if len(text) > max_chars:
             text = text[:max_chars]
-            logger.warning("chunk_truncated_for_embedding", original_len=len(text), max_chars=max_chars)
+            logger.warning(
+                "chunk_truncated_for_embedding",
+                original_len=len(text),
+                max_chars=max_chars,
+            )
 
         text_tokens = _estimate_tokens(text)
 
@@ -223,7 +227,7 @@ class EmbeddingService:
                     raise
 
                 if attempt < max_attempts:
-                    delay = 2.0 ** attempt  # 2s, 4s
+                    delay = 2.0**attempt  # 2s, 4s
                     logger.warning(
                         "embedding_transient_error_retry",
                         batch_idx=batch_idx,

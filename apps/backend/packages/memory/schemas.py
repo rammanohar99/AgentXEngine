@@ -35,7 +35,7 @@ class MemoryEntry(BaseModel):
     content: str
     metadata: dict[str, Any] = Field(default_factory=dict)
     created_at: datetime.datetime = Field(
-        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
     )
     importance: float = 1.0  # 0.0–1.0, used for pruning decisions
 
@@ -46,7 +46,7 @@ class ConversationTurn(BaseModel):
     role: str  # "user" | "assistant"
     content: str
     timestamp: datetime.datetime = Field(
-        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc)
+        default_factory=lambda: datetime.datetime.now(datetime.UTC)
     )
 
 

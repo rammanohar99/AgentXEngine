@@ -30,8 +30,9 @@ Usage:
 from __future__ import annotations
 
 import time
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Any, Generator
+from typing import Any
 
 import structlog
 
@@ -47,7 +48,7 @@ class NoOpSpan:
     def end(self, output: Any = None, error: str | None = None) -> None:
         pass
 
-    def __enter__(self) -> "NoOpSpan":
+    def __enter__(self) -> NoOpSpan:
         return self
 
     def __exit__(self, *args: Any) -> None:
@@ -69,7 +70,7 @@ class NoOpTrace:
     def end(self, output: str | None = None) -> None:
         pass
 
-    def __enter__(self) -> "NoOpTrace":
+    def __enter__(self) -> NoOpTrace:
         return self
 
     def __exit__(self, *args: Any) -> None:
@@ -101,7 +102,7 @@ class LangfuseSpan:
         self._start = time.perf_counter()
 
     def end(self, output: Any = None, error: str | None = None) -> None:
-        duration_ms = round((time.perf_counter() - self._start) * 1000, 2)
+        round((time.perf_counter() - self._start) * 1000, 2)
         try:
             kwargs: dict[str, Any] = {"end_time": None}
             if output is not None:
@@ -113,7 +114,7 @@ class LangfuseSpan:
         except Exception as exc:
             logger.warning("langfuse_span_end_failed", error=str(exc))
 
-    def __enter__(self) -> "LangfuseSpan":
+    def __enter__(self) -> LangfuseSpan:
         return self
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
@@ -170,7 +171,7 @@ class LangfuseTrace:
         except Exception as exc:
             logger.warning("langfuse_trace_end_failed", error=str(exc))
 
-    def __enter__(self) -> "LangfuseTrace":
+    def __enter__(self) -> LangfuseTrace:
         return self
 
     def __exit__(self, *args: Any) -> None:
@@ -214,12 +215,13 @@ class AgentTracer:
         """Create a trace for a complete agent run."""
         try:
             client = self._get_client()
-            
+
             import structlog
+
             context_vars = structlog.contextvars.get_contextvars()
             correlation_id = context_vars.get("correlation_id", "")
             trace_id = context_vars.get("trace_id", "")
-            
+
             metadata = {"run_id": run_id}
             tags = []
             if correlation_id:
@@ -228,7 +230,7 @@ class AgentTracer:
             if trace_id:
                 metadata["otel_trace_id"] = trace_id
                 tags.append(f"otel_trace_id:{trace_id}")
-                
+
             trace = client.trace(
                 name="agent_run",
                 session_id=session_id,
@@ -249,7 +251,7 @@ class AgentTracer:
         return True
 
     @classmethod
-    def from_settings(cls, settings: Any) -> "AgentTracer | NoOpTracer":
+    def from_settings(cls, settings: Any) -> AgentTracer | NoOpTracer:
         """
         Create an AgentTracer from app settings, or NoOpTracer if not configured.
 
