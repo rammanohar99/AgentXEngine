@@ -55,11 +55,10 @@ def summarize_session_memory(
 
 async def _summarize_async(session_id: str, turns: list[dict[str, Any]]) -> dict[str, Any]:
     """Async implementation of memory summarization."""
-    from packages.memory.schemas import ConversationTurn
-    from packages.memory.summarizer import MemorySummarizer
-
     from app.core.redis import get_redis_client
     from app.services.vertex_ai import VertexAIService
+    from packages.memory.schemas import ConversationTurn
+    from packages.memory.summarizer import MemorySummarizer
 
     llm = VertexAIService()
     summarizer = MemorySummarizer(llm_provider=llm)

@@ -18,6 +18,7 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
+
 from packages.agents.runtime import AgentRuntime
 from packages.agents.schemas import AgentEventType
 from packages.agents.tool_registry import ToolRegistry

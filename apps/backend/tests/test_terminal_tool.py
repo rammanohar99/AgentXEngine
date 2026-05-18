@@ -5,6 +5,7 @@ Terminal tool tests — validates the allowlist and command execution.
 from typing import Any
 
 import pytest
+
 from packages.agents.schemas import ToolCall
 from packages.agents.tools.terminal import TerminalTool, _is_permitted
 

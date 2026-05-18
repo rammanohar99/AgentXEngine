@@ -3,6 +3,7 @@ Chunker unit tests — deterministic, no external dependencies.
 """
 
 import pytest
+
 from packages.rag.chunker import Chunker
 from packages.rag.schemas import Document, DocumentMetadata
 

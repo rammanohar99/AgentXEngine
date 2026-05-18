@@ -20,6 +20,13 @@ Routes are thin: validate input, call RAGService, return typed response.
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.config import get_settings
+from app.core.database import get_db_session
+from app.core.logging import get_logger
+from app.schemas.common import APIResponse
+from app.services.rag import RAGService
 from packages.rag.extractor import (
     extract_image_text,
     extract_text,
@@ -35,13 +42,6 @@ from packages.rag.schemas import (
 from packages.rag.schemas import (
     IngestRequest as RagIngestRequest,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.core.config import get_settings
-from app.core.database import get_db_session
-from app.core.logging import get_logger
-from app.schemas.common import APIResponse
-from app.services.rag import RAGService
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/documents", tags=["documents"])

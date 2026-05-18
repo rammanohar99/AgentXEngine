@@ -71,12 +71,11 @@ def ingest_document(
 
 async def _ingest_document_async(content: str, metadata: dict[str, Any]) -> dict[str, Any]:
     """Async implementation of document ingestion."""
-    from packages.rag.embeddings import EmbeddingService
-    from packages.rag.schemas import DocumentMetadata, IngestRequest
-
     from app.core.config import get_settings
     from app.core.database import get_session_factory
     from app.services.rag import RAGService
+    from packages.rag.embeddings import EmbeddingService
+    from packages.rag.schemas import DocumentMetadata, IngestRequest
 
     settings = get_settings()
     embedding_service = EmbeddingService(

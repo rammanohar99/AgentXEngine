@@ -19,6 +19,10 @@ from __future__ import annotations
 
 from typing import Any
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.logging import get_logger
+from app.repositories.document import DocumentRepository
 from packages.rag.chunker import Chunker
 from packages.rag.schemas import (
     Document,
@@ -29,10 +33,6 @@ from packages.rag.schemas import (
     SearchRequest,
     SearchResponse,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.core.logging import get_logger
-from app.repositories.document import DocumentRepository
 
 logger = get_logger(__name__)
 

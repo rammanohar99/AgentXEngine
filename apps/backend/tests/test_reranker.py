@@ -5,6 +5,7 @@ Reranker tests — mock LLM, deterministic scoring.
 import asyncio
 
 import pytest
+
 from packages.rag.reranker import Reranker
 from packages.rag.schemas import DocumentMetadata, RetrievalResult
 

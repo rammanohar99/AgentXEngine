@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
+
 from packages.agents.agent_types import AgentRole, get_agent_config
 from packages.agents.orchestrator import Orchestrator
 from packages.agents.schemas import AgentEventType

@@ -8,6 +8,7 @@ Database query uses an in-memory SQLite database.
 from __future__ import annotations
 
 import pytest
+
 from packages.agents.schemas import ToolCall
 from packages.agents.tools.database_query import DatabaseQueryTool, _is_safe_query
 from packages.shared.utils import (

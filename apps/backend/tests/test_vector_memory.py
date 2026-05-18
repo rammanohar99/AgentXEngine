@@ -3,6 +3,7 @@ Vector memory tests — uses a mock embedder, no Vertex AI needed.
 """
 
 import pytest
+
 from packages.memory.vector_memory import VectorMemory, _cosine_similarity
 
 
