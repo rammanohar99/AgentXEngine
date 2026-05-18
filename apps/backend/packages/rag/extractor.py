@@ -21,8 +21,9 @@ from __future__ import annotations
 
 import csv
 import io
-import structlog
 from typing import Any
+
+import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -92,7 +93,6 @@ async def extract_image_text(
     Uses the already-configured google-genai client — no Tesseract required.
     Returns the extracted text, or raises ValueError if extraction fails.
     """
-    import base64
 
     from google.genai import types
 

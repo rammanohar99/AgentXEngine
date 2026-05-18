@@ -29,11 +29,11 @@ from typing import Any, cast
 
 from google import genai
 from google.genai import types
-from packages.agents.resilience import RetryPolicy
-from packages.observability.metrics import get_metrics
 
 from app.core.config import Settings, get_settings
 from app.core.logging import get_logger
+from packages.agents.resilience import RetryPolicy
+from packages.observability.metrics import get_metrics
 
 logger = get_logger(__name__)
 metrics = get_metrics()

@@ -23,6 +23,14 @@ import uuid
 from collections.abc import AsyncGenerator
 from typing import Any, cast
 
+from redis.asyncio import Redis
+
+from app.core.config import Settings, get_settings
+from app.core.logging import get_logger
+from app.core.redis import get_redis_client
+from app.schemas.chat import ChatMessage, ChatRequest, ChatResponse, MessageRole, StreamChunk
+from app.services.session import SessionManager
+from app.services.vertex_ai import VertexAIService
 from packages.agents.runtime import AgentRuntime, Message
 from packages.agents.schemas import AgentEventType
 from packages.agents.tool_registry import ToolRegistry
@@ -33,14 +41,6 @@ from packages.memory.short_term import ShortTermMemory
 from packages.memory.summarizer import MemorySummarizer
 from packages.observability.evaluation import AgentEvaluator
 from packages.observability.tracer import AgentTracer
-from redis.asyncio import Redis
-
-from app.core.config import Settings, get_settings
-from app.core.logging import get_logger
-from app.core.redis import get_redis_client
-from app.schemas.chat import ChatMessage, ChatRequest, ChatResponse, MessageRole, StreamChunk
-from app.services.session import SessionManager
-from app.services.vertex_ai import VertexAIService
 
 logger = get_logger(__name__)
 
@@ -129,11 +129,10 @@ def _register_retrieval_tool(
         return
 
     try:
-        from packages.agents.tools.retrieval import RetrieveDocumentsTool
-        from packages.rag.embeddings import EmbeddingService
-
         from app.core.database import get_session_factory
         from app.repositories.document import DocumentRepository
+        from packages.agents.tools.retrieval import RetrieveDocumentsTool
+        from packages.rag.embeddings import EmbeddingService
 
         embedding_service = EmbeddingService(
             project=settings.google_cloud_project,
