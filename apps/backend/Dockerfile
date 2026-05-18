@@ -1,7 +1,7 @@
-# Build context must be the repo root:
-#   docker build -f apps/backend/Dockerfile .
+# Build context is apps/backend/ — self-contained, no repo root needed.
+#   docker build -f apps/backend/Dockerfile apps/backend/
 #
-# docker-compose.yml sets context: . (repo root) for this service.
+# docker-compose.yml sets context: ./apps/backend for this service.
 
 # ── Stage 1: dependency builder ──────────────────────────────────────────────
 FROM python:3.12-slim AS builder
@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy only the dependency manifest first for layer caching
-COPY apps/backend/pyproject.toml .
+COPY pyproject.toml .
 
 RUN pip install --upgrade pip && \
     pip install --prefix=/install .
@@ -33,13 +33,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=builder /install /usr/local
 
 # Copy application source
-COPY apps/backend/app/ ./app/
+COPY app/ ./app/
 
 # Copy Alembic migrations
-COPY apps/backend/alembic/ ./alembic/
-COPY apps/backend/alembic.ini ./alembic.ini
+COPY alembic/ ./alembic/
+COPY alembic.ini ./alembic.ini
 
-# Copy monorepo packages (agent runtime, tools, etc.)
+# Copy packages (agent runtime, RAG, memory, tools, etc.)
 COPY packages/ ./packages/
 
 # Non-root user

@@ -1,4 +1,4 @@
-# AI Engineering OS
+# AgentXEngine
 
 A production-grade multi-agent AI platform for autonomous code understanding,
 repository analysis, RAG, and engineering workflows.

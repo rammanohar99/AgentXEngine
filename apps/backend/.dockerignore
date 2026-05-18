@@ -1,0 +1,27 @@
+# ── Dev/editor artifacts ─────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.pyc
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.benchmarks/
+backend.egg-info/
+
+# ── Python virtual envs ───────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+
+# ── Tests — not needed at runtime ────────────────────────────────────────────
+tests/
+
+# ── Local env files — never bake secrets into images ─────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── OS artifacts ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db

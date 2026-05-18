@@ -35,8 +35,8 @@ services:
   # ── FastAPI backend ──────────────────────────────────────────────────────────
   backend:
     build:
-      context: .
-      dockerfile: apps/backend/Dockerfile
+      context: ./apps/backend
+      dockerfile: Dockerfile
     user: root  # needed to read the gcloud ADC mount in development
     env_file:
       - ./apps/backend/.env
@@ -57,12 +57,10 @@ services:
     volumes:
       # Hot-reload in development: mount source over the image copy
       - ./apps/backend/app:/app/app
-      - ./packages:/app/packages
-      # Google Application Default Credentials (for Vertex AI — Option B only)
-      # Set GCLOUD_CONFIG_DIR in your shell or .env to your local gcloud config path.
-      # Windows default : C:/Users/<you>/AppData/Roaming/gcloud
-      # macOS/Linux default: ~/.config/gcloud
-      - ${GCLOUD_CONFIG_DIR:-~/.config/gcloud}:/root/.config/gcloud:ro
+      - ./apps/backend/packages:/app/packages
+      # Google Application Default Credentials (for Vertex AI)
+      # GCLOUD_CONFIG_DIR is set in the root .env file
+      - ${GCLOUD_CONFIG_DIR}:/root/.config/gcloud:ro
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/api/v1/health || exit 1"]
@@ -84,8 +82,8 @@ services:
   # ── Celery worker (Phase 4 — wired now, activated later) ────────────────────
   worker:
     build:
-      context: .
-      dockerfile: apps/backend/Dockerfile
+      context: ./apps/backend
+      dockerfile: Dockerfile
     user: root  # needed to read the gcloud ADC mount in development
     env_file:
       - ./apps/backend/.env
@@ -101,8 +99,8 @@ services:
         condition: service_healthy
     volumes:
       - ./apps/backend/app:/app/app
-      - ./packages:/app/packages
-      - ${GCLOUD_CONFIG_DIR:-~/.config/gcloud}:/root/.config/gcloud:ro
+      - ./apps/backend/packages:/app/packages
+      - ${GCLOUD_CONFIG_DIR}:/root/.config/gcloud:ro
     command: celery -A app.workers.celery_app worker --loglevel=info --concurrency=2
 
 volumes:

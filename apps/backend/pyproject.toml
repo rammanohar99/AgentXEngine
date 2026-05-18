@@ -62,8 +62,8 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
-# Make packages/ importable during tests (monorepo root is two levels up)
-pythonpath = [".", "../.."]
+# packages/ lives inside apps/backend/ — "." (apps/backend) is the root
+pythonpath = ["."]
 # Suppress expected warnings in test runs
 filterwarnings = [
     "ignore::UserWarning:pydantic",
