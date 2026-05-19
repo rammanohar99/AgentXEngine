@@ -26,10 +26,10 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-EMBEDDING_MODEL = "text-embedding-004"
+EMBEDDING_MODEL = "models/gemini-embedding-001"
 EMBEDDING_DIMENSIONS = 768
 
-# Hard limits from the Vertex AI / Gemini embedding API
+# Hard limits from the Gemini embedding API
 _MAX_TEXTS_PER_BATCH = 250
 _MAX_TOKENS_PER_BATCH = 18_000  # Stay under 20k with a safety margin
 _MAX_TOKENS_PER_TEXT = 2_048
@@ -246,10 +246,14 @@ class EmbeddingService:
         client = self._get_client()
 
         if self._api_key:
-            # Developer API mode — EmbedContentConfig not supported
+            # Developer API mode — pass output_dimensionality to truncate to 768
             response = await client.aio.models.embed_content(
                 model=EMBEDDING_MODEL,
                 contents=texts,
+                config=types.EmbedContentConfig(
+                    task_type=task_type,
+                    output_dimensionality=EMBEDDING_DIMENSIONS,
+                ),
             )
         else:
             response = await client.aio.models.embed_content(
